@@ -34,7 +34,7 @@ void set_dsp_clk(uint32_t id, uint32_t freq_sel)
 	int		control;
 	uint32_t	clk_sel;
 	uint32_t	clk_div;
-	uint32_t	addr;
+	uint32_t	addr = 0;
 
 	switch ( id )
 	{
@@ -94,7 +94,7 @@ static int do_startdsp(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[]
 	addr = simple_strtoul(argv[2], NULL, 16);
 	freq_sel = simple_strtoul(argv[3], NULL, 16);
 	printf("dsp%d boot \n",dspid);
-	printf("dspboot start address:0x%lx\n",addr);
+	printf("dspboot start address:0x%d\n",addr);
 	printf("dsp clk num:%d\n",freq_sel);
 	power_set_dsp(dspid,1);
 	udelay(100);
