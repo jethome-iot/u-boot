@@ -115,7 +115,7 @@ static int do_vout_output(cmd_tbl_t *cmdtp, int flag, int argc, char *const argv
 		printf("cmd_vout: mode malloc falied, exit\n");
 		return CMD_RET_FAILURE;
 	}
-	memset(mode, 0, sizeof(mode));
+	memset(mode, 0, (sizeof(char) * 64));
 	sprintf(mode, "%s", argv[1]);
 	frac = vout_parse_vout_name(mode);
 
@@ -206,7 +206,7 @@ static int do_vout2_output(cmd_tbl_t *cmdtp, int flag, int argc, char *const arg
 		printf("cmd_vout: mode malloc falied, exit\n");
 		return CMD_RET_FAILURE;
 	}
-	memset(mode, 0, sizeof(mode));
+	memset(mode, 0, (sizeof(char) * 64));
 	sprintf(mode, "%s", argv[1]);
 	frac = vout_parse_vout_name(mode);
 
@@ -281,7 +281,7 @@ static int do_vout2_prepare(cmd_tbl_t *cmdtp, int flag, int argc, char *const ar
 		printf("cmd_vout: mode malloc falied, exit\n");
 		return CMD_RET_FAILURE;
 	}
-	memset(mode, 0, sizeof(mode));
+	memset(mode, 0, (sizeof(char) * 64));
 	sprintf(mode, "%s", argv[1]);
 	frac = vout_parse_vout_name(mode);
 
