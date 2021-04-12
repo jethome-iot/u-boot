@@ -461,8 +461,9 @@ static void flash(char *cmd_parameter, char *response)
 			strncpy(name, "userdata", 8);
 	} else if (strcmp(cmd_parameter, "dts") == 0) {
 		strncpy(name, "dtb", 3);
-	else
+	} else {
 		strncpy(name, cmd_parameter, 32);
+	}
 
 #ifdef CONFIG_BOOTLOADER_CONTROL_BLOCK
 	if (dynamic_partition) {
@@ -495,7 +496,8 @@ static void flash(char *cmd_parameter, char *response)
  */
 static void erase(char *cmd_parameter, char *response)
 {
-	char name[32];
+	char name[32] = {0};
+	u64 rc = 0;
 
 	if (check_lock()) {
 		printf("device is locked, can not run this cmd.Please flashing unlock & flashing unlock_critical\n");

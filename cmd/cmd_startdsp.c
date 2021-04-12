@@ -82,8 +82,8 @@ void set_dsp_clk(uint32_t id, uint32_t freq_sel)
 
 static int do_startdsp(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
 {
-	unsigned long addr;
-	unsigned int dspid;
+	uint32_t addr;
+	uint32_t dspid;
 	uint32_t freq_sel;
 	int ret=0;
 	if (argc <= 1) {
