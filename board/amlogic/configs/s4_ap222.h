@@ -107,7 +107,7 @@
         "sdcburncfg=aml_sdc_burn.ini\0"\
         "EnableSelinux=enforcing\0" \
         "recovery_part=recovery\0"\
-        "loglevel=8\0" \
+        "loglevel=1\0" \
         "lock=10101000\0"\
         "recovery_offset=0\0"\
         "cvbs_drv=0\0"\
