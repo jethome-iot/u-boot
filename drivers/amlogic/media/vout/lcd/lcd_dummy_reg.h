@@ -454,6 +454,11 @@
 #define CLKCTRL_VID_PLL_CLK0_DIV		((0x0039  << 2) + 0xfe000000)
 #endif
 
+
+#ifndef CLKCTRL_TCON_CLK_CNTL
+#define CLKCTRL_TCON_CLK_CNTL                      ((0x0087  << 2) + 0xfe000000)
+#endif
+
 #ifndef ENCL_VIDEO_H_PRE_DE_END
 #define ENCL_VIDEO_H_PRE_DE_END                    0x1ccf
 #endif
