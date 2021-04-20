@@ -136,7 +136,7 @@
             "if itest ${upgrade_step} == 3; then run init_display;run storeargs; run update; fi;"\
             "\0"\
         "storeargs="\
-            "setenv bootargs ${initargs} loglevel={loglevel} otg_device=${otg_device} "\
+            "setenv bootargs ${initargs} loglevel=${loglevel} otg_device=${otg_device} "\
                 "logo=${display_layer},loaded,${fb_addr} vout=${outputmode},${vout_init} panel_type=${panel_type} "\
                 "hdmitx=${cecconfig},${colorattribute} hdmimode=${hdmimode} "\
                 "hdmichecksum=${hdmichecksum} dolby_vision_on=${dolby_vision_on} " \
