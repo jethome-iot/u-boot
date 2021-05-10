@@ -1363,7 +1363,7 @@ int check_base_address(void)
 	if (chip_id == 0)
 		chip_id = CHIP_ID_MASK;
 	if (chip_id) {
-		if(chip_id==MESON_CPU_MAJOR_ID_S4D)
+		if (chip_id == MESON_CPU_MAJOR_ID_S4D)
 			chip_id=MESON_CPU_MAJOR_ID_S4;
 		for (table_index = 0; table_index < table_max; table_index++) { //p_ddr_base=(p_ddr_base+1);
 			printf("\ntable_index=%08x,p_ddr_base_add=%08x,(p_ddr_base->chip_id==%08x",
