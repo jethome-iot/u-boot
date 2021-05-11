@@ -148,7 +148,7 @@ static void getvar_version(char *var_parameter, char *response)
 static void getvar_bootloader_version(char *var_parameter, char *response)
 {
 	char s_version[32];
-	strncpy(s_version, "01.01.", 6);
+	strcpy(s_version, "01.01.\0");
 	strcat(s_version, U_BOOT_DATE_TIME);
 	printf("s_version: %s\n", s_version);
 	if (busy_flag == 1) {
@@ -254,7 +254,7 @@ static void getvar_super_partition_name(char *var_parameter, char *response)
 {
 	char *slot_name;
 	slot_name = env_get("slot-suffixes");
-	char name[64];
+	char name[64] = {0};
 	if (has_boot_slot == 0) {
 		strncpy(name, "super-partition-name: super", 64);
 	} else {
@@ -557,12 +557,16 @@ static void getvar_partition_size(char *part_name, char *response)
 	size_t size;
 	char name[32];
 
-	if (strcmp(part_name, "userdata") == 0 && !vendor_boot_partition)
-		strncpy(name, "data", 4);
-	else if (strcmp(part_name, "data") == 0 && vendor_boot_partition)
-		strncpy(name, "userdata", 8);
-	else
-		strncpy(name, part_name, 32);
+	if (strcmp(part_name, "userdata") == 0 || strcmp(part_name, "data") == 0) {
+		rc = store_part_size("userdata");
+		if (-1 == rc)
+			strcpy(name, "data");
+		else
+			strcpy(name, "userdata");
+	} else {
+		strncpy(name, part_name, 31);
+	}
+	strcat(name, "\0");
 
 #if CONFIG_IS_ENABLED(FASTBOOT_FLASH_MMC)
 	struct blk_desc *dev_desc;
@@ -582,11 +586,11 @@ static void getvar_partition_size(char *part_name, char *response)
 #endif
 	if (r >= 0) {
 		if (busy_flag == 1) {
-			char name[64];
-			strncpy(name, "INFOpartition-size:", 64);
-			strcat(name, part_name);
-			strcat(name, ": ");
-			fastboot_response(name, response, "0x%016zx", size);
+			char all_name[64];
+			strcpy(all_name, "INFOpartition-size:\0");
+			strcat(all_name, name);
+			strcat(all_name, ": ");
+			fastboot_response(all_name, response, "0x%016zx", size);
 		}
 		else
 			fastboot_response("OKAY", response, "0x%016zx", size);
