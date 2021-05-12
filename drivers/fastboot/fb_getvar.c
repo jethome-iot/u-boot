@@ -556,6 +556,7 @@ static void getvar_partition_size(char *part_name, char *response)
 	int r;
 	size_t size;
 	char name[32];
+	u64 rc = 0;
 
 	if (strcmp(part_name, "userdata") == 0 || strcmp(part_name, "data") == 0) {
 		rc = store_part_size("userdata");

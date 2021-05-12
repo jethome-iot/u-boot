@@ -9829,14 +9829,14 @@ int do_ddr_test_cmd(cmd_tbl_t *cmdtp, int flag, int argc, char *const argv[])
 			if ((p_ddr_base->chip_id == MESON_CPU_MAJOR_ID_C2) || (p_ddr_base->chip_id == MESON_CPU_MAJOR_ID_T5) || (p_ddr_base->chip_id == MESON_CPU_MAJOR_ID_T5D) || (p_ddr_base->chip_id == MESON_CPU_MAJOR_ID_S4)
 			||(p_ddr_base->chip_id == MESON_CPU_MAJOR_ID_T3)) {
 				 if ((p_ddr_base->chip_id == MESON_CPU_MAJOR_ID_T3)) {
-					dmc_ddr_config_channel_id=0;
+					/*dmc_ddr_config_channel_id=0;
 					dmc_change_channel(dmc_ddr_config_channel_id);
 					do_ddr_display_c2_ddr_information((cmd_tbl_t *)cmdtp, (int)flag, (int)argc2, (argv2));
 					dmc_ddr_config_channel_id=1;
 					dmc_change_channel(dmc_ddr_config_channel_id);
 					do_ddr_display_c2_ddr_information((cmd_tbl_t *)cmdtp, (int)flag, (int)argc2, (argv2));
 					dmc_ddr_config_channel_id=0;
-					dmc_change_channel(dmc_ddr_config_channel_id);
+					dmc_change_channel(dmc_ddr_config_channel_id);*/
 				}
 				else
 					do_ddr_display_c2_ddr_information((cmd_tbl_t *)cmdtp, (int)flag, (int)argc2, (argv2));
