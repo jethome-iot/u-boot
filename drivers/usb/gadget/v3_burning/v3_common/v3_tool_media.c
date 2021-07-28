@@ -322,12 +322,6 @@ int v3tool_media_check_image_size(int64_t imgSz, const char* partName)
             FB_EXIT("imgsz 0x%llx >= max sz 0x%x\n", imgSz, dtbCap);
         return 0;
     }
-	if (!strcmp("gpt", partName)) {
-		if (imgSz >= 0x100000) {
-			FB_EXIT("imgsz 0x%llx >= max sz 1M\n", imgSz);
-		}
-		return 0;
-	}
 
     partCap = store_part_size(partName);
     if (!partCap) {
@@ -401,17 +395,18 @@ const char* BackupPart = (const char*)(CONFIG_BACKUP_PART_NORMAL_ERASE);
 char* BackupPartAddr = (char*)(V3_DOWNLOAD_MEM_BASE);
 #endif// #ifdef CONFIG_BACKUP_PART_NORMAL_ERASE
 
-int v3tool_storage_init(const int eraseFlash, unsigned int dtbImgSz, unsigned int gptImgSz)
+int v3tool_storage_init(const int eraseFlash, unsigned dtbImgSz)
 {
 	int ret = 0;
 	unsigned char* dtbLoadedAddr = (unsigned char*)V3_DTB_LOAD_ADDR;
+	int dtb_valid = 0;
 
 	if (V3TOOL_WORK_MODE_USB_PRODUCE != v3tool_work_mode_get()) {//Already inited in other work mode
 		/*DWN_MSG("Exit before re-init\n");*/
 		/*store_exit();*/
 	}
 
-	if (dtbImgSz && !gptImgSz) {
+	if (dtbImgSz) {
 #if defined(CONFIG_MTD) && defined(CONFIG_AML_MTDPART)
 		extern int get_meson_mtd_partition_table(struct mtd_partition **partitions);
 		int mtdParts = -1;
@@ -425,11 +420,7 @@ int v3tool_storage_init(const int eraseFlash, unsigned int dtbImgSz, unsigned in
 #endif // #if defined(CONFIG_MTD) && defined(CONFIG_AML_MTDPART)
 			ret = get_partition_from_dts(dtbLoadedAddr);
 		if (ret) FBS_EXIT(_ACK, "Failed at check dts\n");
-	} else if (gptImgSz) {
-		if (get_partition_from_dts((unsigned char *)V3_GPT_LOAD_ADDR))
-			FBS_EXIT(_ACK, "Fail at check gpt\n");
-		else
-			FB_MSG("Parse partition table from GPT\n");
+		dtb_valid = 1;
 	}
 
     if (sheader_need()) sheader_load((void*)V3_PAYLOAD_LOAD_ADDR);
@@ -485,14 +476,6 @@ int v3tool_storage_init(const int eraseFlash, unsigned int dtbImgSz, unsigned in
 	} else if (initFlag > 1) {
 		ret = store_erase(NULL, 0, 0, 0);
 		if (ret) FBS_EXIT(_ACK, "Fail in erase flash, ret[%d]\n", ret);
-		if (store_get_type() == BOOT_EMMC) {
-			FB_MSG("TO erase gpt for compatible\n");
-			store_gpt_erase();
-			if (dtbImgSz) {
-				FB_MSG("to update dtb for compatible\n");
-				store_rsv_write("dtb", dtbImgSz, dtbLoadedAddr);
-			}
-		}
 #ifdef CONFIG_BACKUP_PART_NORMAL_ERASE
 		if (backupPartSz) {
 			FB_MSG("restore BackupPart %s from mem\n", BackupPart);
@@ -509,7 +492,8 @@ int v3tool_storage_init(const int eraseFlash, unsigned int dtbImgSz, unsigned in
 	_disk_intialed_ok  = 1;
 	if (eraseFlash && eraseFlash < 5) _disk_intialed_ok += (1 <<16);
 
-	if (dtbImgSz)//for key init, or fail when get /unifykey
+	FB_DBG("dtb_valid %d, dtbImgSz 0x%x\n", dtb_valid, dtbImgSz);
+	if (dtb_valid)//for key init, or fail when get /unifykey
 	{
 		unsigned long fdtAddr = (unsigned long)dtbLoadedAddr;
 #ifdef CONFIG_MULTI_DTB
