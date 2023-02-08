@@ -468,6 +468,7 @@ static int eth_get_efuse_mac(struct udevice *dev)
 	return -1;
 #else
 #define MAC_MAX_LEN	17
+#define EFUSE_MAC_LEN 6
 	int i = 0;
 	int err = 0, exist = 0;
 	ssize_t keysize = 0;
@@ -487,17 +488,21 @@ static int eth_get_efuse_mac(struct udevice *dev)
 	if (err)
 		return err;
 
-	if (keysize != MAC_MAX_LEN) {
+	if (keysize != MAC_MAX_LEN && keysize != EFUSE_MAC_LEN)
 		return -EINVAL;
-	}
 
 	err = key_unify_read("mac", buf, keysize);
 	if (err)
 		return err;
+	if (keysize == EFUSE_MAC_LEN) {
+		for (i = 0; i < 6; i++)
+			pdata->enetaddr[i] = buf[i];
 
-	for (i=0; i<6; i++) {
-		buf[i*3 + 2] = '\0';
-		pdata->enetaddr[i] = simple_strtoul((char *)&buf[i*3], NULL, 16);
+	} else {
+		for (i = 0; i < 6; i++) {
+			buf[i * 3 + 2] = '\0';
+			pdata->enetaddr[i] = simple_strtoul((char *)&buf[i * 3], NULL, 16);
+		}
 	}
 
 	return key_unify_uninit();

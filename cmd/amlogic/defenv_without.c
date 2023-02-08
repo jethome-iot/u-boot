@@ -126,4 +126,3 @@ U_BOOT_CMD_COMPLETE(
    "               reserve specified envs after defaulting env\n",   //usage
    var_complete
 );
-
