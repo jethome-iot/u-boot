@@ -10,7 +10,9 @@
 
 /* Common DTSI for devices which are based on the P212 reference board. */
 
-#include "meson-s4-txxx.dtsi"
+#include "meson-s4.dtsi"
+#include "meson-s4-mali.dtsi"
+
 
 / {
 	aliases {
@@ -93,6 +95,8 @@
 
 &ethmac {
 	status = "okay";
+	phy-mode = "rmii";
+	phy-handle = <&internal_phy>;
 	internal_phy = <1>;
 	mc_val = <0x4be04>;
 	/*mc_val = <0x1621>;*/

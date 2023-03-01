@@ -79,9 +79,12 @@
 	status = "okay";
 };
 
+/* This is connected to the Bluetooth module: */
+/*
 &uart_b {
 	status = "disabled";
 };
+*/
 
 &saradc {
 	status = "okay";
