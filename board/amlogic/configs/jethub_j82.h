@@ -307,12 +307,13 @@
 		"\0"\
 
 #ifndef CONFIG_PXP_DDR
-#define CONFIG_PREBOOT  \
+#define CONFIG_PREBOOT  "echo preboot"
+#define CONFIG_PREBOOT2  \
             "run bcb_cmd; "\
             "run upgrade_check;"\
             "run init_display;"\
             "run storeargs;"\
-	    "run upgrade_key;" \
+	        "run upgrade_key;" \
             "bcb uboot-command;"\
             "run switch_bootmode;"
 #else
@@ -477,16 +478,16 @@
 #define CONFIG_LZO 1
 
 #define CONFIG_FAT_WRITE 1
-#define CONFIG_AML_FACTORY_PROVISION 1
+#define CONFIG_AML_FACTORY_PROVISION 0 //# was 1
 
-#define CONFIG_AML_WATERMARK 1
+#define CONFIG_AML_WATERMARK 0 //# was 1
 
 /* Cache Definitions */
 /* #define CONFIG_SYS_DCACHE_OFF */
 /* #define CONFIG_SYS_ICACHE_OFF */
 
 /* other functions */
-#define CONFIG_LIBAVB		1
+//#define CONFIG_LIBAVB		0 //# was 1
 
 /* define CONFIG_SYS_MEM_TOP_HIDE 8M space for free buffer */
 #define CONFIG_SYS_MEM_TOP_HIDE		0x00800000
@@ -506,7 +507,7 @@
 #define CONFIG_AUTO_ADAPT_DDR_DTB 1
 
 /* support secure boot */
-#define CONFIG_AML_SECURE_UBOOT   1
+//#define CONFIG_AML_SECURE_UBOOT   0 //# was 1
 
 #if defined(CONFIG_AML_SECURE_UBOOT)
 
