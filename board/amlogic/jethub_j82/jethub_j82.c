@@ -150,13 +150,6 @@ int active_clk(void)
 	return 0;
 }
 
-
-#ifdef CONFIG_AML_HDMITX20
-static void hdmitx_set_hdmi_5v(void)
-{
-	/*Power on VCC_5V for HDMI_5V*/
-}
-#endif
 void board_init_mem(void) {
 	#if 1
 	/* config bootm low size, make sure whole dram/psram space can be used */
@@ -192,12 +185,10 @@ int board_init(void)
 	active_clk();
 	#endif
 	run_command("gpio set GPIOH_7", 0);
-#ifdef CONFIG_AML_HDMITX20
-	hdmitx_set_hdmi_5v();
-	hdmitx_init();
-#endif
 #endif// #if !defined(CONFIG_PXP_DDR) //bypass below operations for pxp
+
 	pinctrl_devices_active(PIN_CONTROLLER_NUM);
+	printf("end board init\n");
 	return 0;
 }
 
@@ -236,6 +227,7 @@ int board_late_init(void)
 #endif//#if defined(CONFIG_AML_V3_FACTORY_BURN) && defined(CONFIG_AML_V3_USB_TOOl)
 #endif// #if !defined(CONFIG_PXP_DDR) //bypass below operations for pxp
 
+printf("late_board init before vpu\n");
 #ifdef CONFIG_AML_VPU
 	vpu_probe();
 #endif
@@ -245,8 +237,9 @@ int board_late_init(void)
 #ifdef CONFIG_AML_CVBS
 	cvbs_init();
 #endif
-	run_command("amlsecurecheck", 0);
-	run_command("update_tries", 0);
+printf("late_board init after cvbs\n");
+	//run_command("amlsecurecheck", 0);
+	//run_command("update_tries", 0);
 
 	unsigned char chipid[16];
 
@@ -274,6 +267,8 @@ int board_late_init(void)
 		env_set("cpu_id", "1234567890");
 	}
 	emmc_quirks();
+	printf("end board late init\n");
+
 	return 0;
 }
 
@@ -338,7 +333,7 @@ int mach_cpu_init(void) {
 			((readl(SYSCTRL_SEC_STATUS_REG4) & 0xFFF00000) << 4);
 	bd_mem_map[0].size = nddrSize;
 #endif
-	//printf("\nmach_cpu_init\n");
+	printf("\nmach_cpu_init\n");
 	return 0;
 }
 
@@ -347,139 +342,6 @@ int ft_board_setup(void *blob, bd_t *bd)
 	/* eg: bl31/32 rsv */
 	return 0;
 }
-
-/* partition table for spinor flash */
-#ifdef CONFIG_SPI_FLASH
-static const struct mtd_partition spiflash_partitions[] = {
-	{
-		.name = "env",
-		.offset = 0,
-		.size = 1 * SZ_256K,
-	},
-	{
-		.name = "dtb",
-		.offset = 0,
-		.size = 1 * SZ_256K,
-	},
-	{
-		.name = "boot",
-		.offset = 0,
-		.size = 2 * SZ_1M,
-	},
-	/* last partition get the rest capacity */
-	{
-		.name = "user",
-		.offset = MTDPART_OFS_APPEND,
-		.size = MTDPART_SIZ_FULL,
-	}
-};
-
-const struct mtd_partition *get_spiflash_partition_table(int *partitions)
-{
-	*partitions = ARRAY_SIZE(spiflash_partitions);
-	return spiflash_partitions;
-}
-#endif /* CONFIG_SPI_FLASH */
-
-#ifdef CONFIG_MESON_NFC
-static struct mtd_partition normal_partition_info[] = {
-{
-	.name = BOOT_BL2E,
-	.offset = 0,
-	.size = 0,
-},
-{
-	.name = BOOT_BL2X,
-	.offset = 0,
-	.size = 0,
-},
-{
-	.name = BOOT_DDRFIP,
-	.offset = 0,
-	.size = 0,
-},
-{
-	.name = BOOT_DEVFIP,
-	.offset = 0,
-	.size = 0,
-},
-{
-	.name = "logo",
-	.offset = 0,
-	.size = 2*SZ_1M,
-},
-{
-	.name = "recovery",
-	.offset = 0,
-	.size = 16*SZ_1M,
-},
-{
-	.name = "boot",
-	.offset = 0,
-	.size = 16*SZ_1M,
-},
-{
-	.name = "system",
-	.offset = 0,
-	.size = 64*SZ_1M,
-},
-/* last partition get the rest capacity */
-{
-	.name = "data",
-	.offset = MTDPART_OFS_APPEND,
-	.size = MTDPART_SIZ_FULL,
-},
-};
-
-struct mtd_partition *get_aml_mtd_partition(void)
-{
-        return normal_partition_info;
-}
-
-int get_aml_partition_count(void)
-{
-        return ARRAY_SIZE(normal_partition_info);
-}
-
-#endif
-
-/* partition table */
-/* partition table for spinand flash */
-#if (defined(CONFIG_SPI_NAND) || defined(CONFIG_MTD_SPI_NAND))
-static const struct mtd_partition spinand_partitions[] = {
-	{
-		.name = "logo",
-		.offset = 0,
-		.size = 2 * SZ_1M,
-	},
-	{
-		.name = "recovery",
-		.offset = 0,
-		.size = 16 * SZ_1M,
-	},
-	{
-		.name = "boot",
-		.offset = 0,
-		.size = 16 * SZ_1M,
-	},
-	{
-		.name = "system",
-		.offset = 0,
-		.size = 64 * SZ_1M,
-	},
-	/* last partition get the rest capacity */
-	{
-		.name = "data",
-		.offset = MTDPART_OFS_APPEND,
-		.size = MTDPART_SIZ_FULL,
-	}
-};
-const struct mtd_partition *get_spinand_partition_table(int *partitions)
-{
-	*partitions = ARRAY_SIZE(spinand_partitions);
-	return spinand_partitions;
-}
-#endif /* CONFIG_SPI_NAND */
 
 #ifdef CONFIG_MULTI_DTB
 int checkhw(char * name)
