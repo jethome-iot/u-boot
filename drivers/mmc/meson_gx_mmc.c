@@ -521,11 +521,14 @@ static int meson_dm_mmc_send_cmd(struct udevice *dev, struct mmc_cmd *cmd,
 	ret = meson_mmc_desc_transfer(dev, cmd, data);
 #endif
 
-	/* use 30s timeout */
+	/* use 1s timeout */
 	start = get_timer(0);
 	do {
 		status = meson_read(mmc, MESON_SD_EMMC_STATUS);
-	} while(!(status & STATUS_END_OF_CHAIN) && get_timer(start) < 30000);
+	} while(!(status & STATUS_END_OF_CHAIN) && get_timer(start) < 1000);
+
+	if (!(status & STATUS_END_OF_CHAIN))
+		status |= STATUS_RESP_TIMEOUT;
 
 	meson_mmc_read_response(mmc, cmd);
 
