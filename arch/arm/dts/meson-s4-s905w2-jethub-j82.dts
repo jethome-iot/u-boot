@@ -44,7 +44,7 @@
 
 /dts-v1/;
 
-#include "meson-s4-jethub-j82.dtsi"
+#include "meson-s4-s905w2-jethub-j82.dtsi"
 
 / {
 	compatible = "amlogic,s4-jethubj82", "amlogic,meson-s4";
