@@ -20,12 +20,14 @@
 #define CONFIG_REMAKE_ELF
 #define CONFIG_ENV_SIZE			0x2000
 #define CONFIG_SYS_MAXARGS		32
-#define CONFIG_SYS_MALLOC_LEN		(32 << 20)
-#define CONFIG_SYS_CBSIZE		1024
+//!meson64 #define CONFIG_SYS_MALLOC_LEN		(32 << 20)
+//!meson64 #define CONFIG_SYS_CBSIZE		1024
 
-#define CONFIG_SYS_SDRAM_BASE		0
-#define CONFIG_SYS_INIT_SP_ADDR		0x20000000
+//!meson64 #define CONFIG_SYS_SDRAM_BASE		0
+//!meson64 #define CONFIG_SYS_INIT_SP_ADDR		0x20000000
+#ifndef CONFIG_SYS_LOAD_ADDR //!meson64
 #define CONFIG_SYS_LOAD_ADDR		CONFIG_SYS_TEXT_BASE
+#endif
 #define CONFIG_SYS_BOOTM_LEN		(64 << 20) /* 64 MiB */
 
 /* ROM USB boot support, auto-execute boot.scr at scriptaddr */

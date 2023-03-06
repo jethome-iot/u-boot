@@ -60,7 +60,7 @@
 #endif//#ifdef CONFIG_DTB_BIND_KERNEL	//load dtb from kernel, such as boot partition
 
 /* args/envs */
-#define CONFIG_SYS_MAXARGS  64
+//!meson64 #define CONFIG_SYS_MAXARGS  64
 #define CONFIG_EXTRA_ENV_SETTINGS \
         "firstboot=1\0"\
         "silent=1\0"\
@@ -320,11 +320,11 @@
 #define CONFIG_PREBOOT  "echo preboot"
 #endif
 /* #define CONFIG_ENV_IS_NOWHERE  1 */
-#define CONFIG_ENV_SIZE   (64*1024)
+//!meson64 #define CONFIG_ENV_SIZE   (64*1024)
 #define CONFIG_FIT 1
 #define CONFIG_OF_LIBFDT 1
 #define CONFIG_ANDROID_BOOT_IMAGE 1
-#define CONFIG_SYS_BOOTM_LEN (64<<20) /* Increase max gunzip size*/
+//!meson64 #define CONFIG_SYS_BOOTM_LEN (64<<20) /* Increase max gunzip size*/
 
 /* ATTENTION */
 /* DDR configs move to board/amlogic/[board]/firmware/timing.c */
@@ -334,7 +334,7 @@
 #ifdef UBOOT_RUN_IN_SRAM
 #define CONFIG_SYS_INIT_SP_ADDR				(0x00200000)
 /* Size of malloc() pool */
-#define CONFIG_SYS_MALLOC_LEN				(256*1024)
+//!meson64 #define CONFIG_SYS_MALLOC_LEN				(256*1024)
 #else
 #define CONFIG_SYS_INIT_SP_ADDR				(0x00200000)
 #define CONFIG_SYS_MALLOC_LEN				(96*1024*1024)
@@ -525,5 +525,6 @@
 
 #define BL32_SHARE_MEM_SIZE  0x800000
 
+#include <configs/jethub.h>
 #endif
 
