@@ -61,7 +61,7 @@
 
 /* args/envs */
 //!meson64 #define CONFIG_SYS_MAXARGS  64
-#define CONFIG_EXTRA_ENV_SETTINGS \
+#define CONFIG_EXTRA_ENV_SETTINGS2 \
         "firstboot=1\0"\
         "silent=1\0"\
         "upgrade_step=0\0"\
@@ -320,7 +320,7 @@
 #define CONFIG_PREBOOT  "echo preboot"
 #endif
 /* #define CONFIG_ENV_IS_NOWHERE  1 */
-//!meson64 #define CONFIG_ENV_SIZE   (64*1024)
+#define CONFIG_ENV_SIZE   (64*1024)
 #define CONFIG_FIT 1
 #define CONFIG_OF_LIBFDT 1
 #define CONFIG_ANDROID_BOOT_IMAGE 1

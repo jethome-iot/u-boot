@@ -18,7 +18,7 @@
 
 #define CONFIG_CPU_ARMV8
 #define CONFIG_REMAKE_ELF
-#define CONFIG_ENV_SIZE			0x2000
+//!meson64 #define CONFIG_ENV_SIZE			0x2000
 #define CONFIG_SYS_MAXARGS		32
 //!meson64 #define CONFIG_SYS_MALLOC_LEN		(32 << 20)
 //!meson64 #define CONFIG_SYS_CBSIZE		1024
