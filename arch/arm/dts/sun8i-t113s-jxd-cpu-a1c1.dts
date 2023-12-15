@@ -297,7 +297,7 @@
 			};
 
 			partition@1900000 {
-				label = "ubi";
+				label = "ubifs";
                                 reg = <0x1900000 0x6700000>;
                         };
                 };
