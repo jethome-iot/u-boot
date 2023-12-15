@@ -593,7 +593,7 @@ static int boot_from_devices(struct spl_image_info *spl_image,
 		for (loader = drv; loader != drv + n_ents; loader++) {
 			printf("Trying to boot from %s %i bootlist: %i\n",
 			       spl_loader_name(loader), loader->boot_device, spl_boot_list[i]);
-			if (bootdev != loader->boot_device)
+			if (loader->boot_device != 8)//if (bootdev != loader->boot_device)
 				continue;
 			if (!CONFIG_IS_ENABLED(SILENT_CONSOLE)) {
 				if (loader)
