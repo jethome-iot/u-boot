@@ -23,6 +23,7 @@ CONFIG_SPL_SPI_SUNXI_NAND_ASSUMED_PAGESIZE=0x800
 #CONFIG_SPL_STACK=0x8000
 CONFIG_SYS_SPI_U_BOOT_OFFS=0x8000
 
+CONFIG_CMD_NAND=y
 CONFIG_CMD_MTD=y
 # CONFIG_CMD_SF is not set
 CONFIG_CMD_MTDPARTS=y
@@ -39,10 +40,19 @@ CONFIG_CMD_UBIFS=y
 #CONFIG_MTD_RAW_NAND=y
 #CONFIG_MTDPARTS_DEFAULT="mtdparts=flash@0:-(sf)"
 #CONFIG_MTDPARTS_DEFAULT="mtdparts=47040000.spi.0:512k(ospi.tiboot3),2m(ospi.tispl),4m(ospi.u-boot),128k(ospi.env),128k(ospi.env.backup),1m(ospi.sysfw),-@8m(ospi.rootfs);47034000.hyperbus:512k(hbmc.tiboot3),2m(hbmc.tispl),4m(hbmc.u-boot),256k(hbmc.env),1m(hbmc.sysfw),-@8m(hbmc.rootfs)"
-CONFIG_MTDPARTS_DEFAULT="spi-nand0:32k(spl),4064k(u-boot),8k(env),64k(dtb),952k(align0),10240k(kernela),10240k(kernelb),105472k(ubi)"
+#CONFIG_MTDPARTS_DEFAULT="spi-nand0:32k(spl),4064k(u-boot),8k(env),64k(dtb),952k(align0),10240k(kernela),10240k(kernelb),105472k(ubifs)"
 CONFIG_MTD=y
 CONFIG_MTD_UBI=y
 CONFIG_MTD_UBI_BLOCK=y
+CONFIG_CMD_SQUASHFS=y
+CONFIG_SPL_FS_SQUASHFS=y
+CONFIG_CMD_UBI=y
+CONFIG_CMD_UBIFS=y
+CONFIG_RBTREE=y
+CONFIG_MTD_DEVICE=y
+CONFIG_MTD_PARTITIONS=y
+CONFIG_CMD_MTDPARTS=y
+CONFIG_LZO=y
 
 CONFIG_DM_MTD=y
 CONFIG_MTD_SPI_NAND=y
