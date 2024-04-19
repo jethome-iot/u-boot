@@ -15,6 +15,9 @@ obj-$(CONFIG_AUTOBOOT) += autoboot.o
 obj-$(CONFIG_BUTTON_CMD) += button_cmd.o
 obj-y += version.o
 
+obj-$(CONFIG_AML_STORAGE) += partitions.o
+obj-$(CONFIG_AML_STORAGE) += aml_dt.o
+
 # # boards
 obj-y += board_f.o
 obj-y += board_r.o
