@@ -2,6 +2,7 @@
 /*
  * Configuration for JetHome devices
  * Copyright (C) 2021 Vyacheslav Bocharov
+ * Copyright (C) 2024 JetHome
  * Author: Vyacheslav Bocharov <adeep@lexina.in>
  */
 
@@ -12,6 +13,13 @@
 #define BOOTENV_DEV_RESCUE(devtypeu, devtypel, instance) \
 	"bootcmd_rescue=" \
 		"if gpio input periphs-banks10; then " \
+		"run bootcmd_mmc0; " \
+		"run bootcmd_usb0;" \
+		"fi;\0"
+#elif defined(CONFIG_MESON_G12A)
+#define BOOTENV_DEV_RESCUE(devtypeu, devtypel, instance) \
+	"bootcmd_rescue=" \
+		"if gpio input aobus-banks10; then " \
 		"run bootcmd_mmc0; " \
 		"run bootcmd_usb0;" \
 		"fi;\0"

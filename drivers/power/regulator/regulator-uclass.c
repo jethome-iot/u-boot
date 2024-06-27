@@ -186,7 +186,7 @@ int regulator_set_enable(struct udevice *dev, bool enable)
 			}
 		}
 	}
-
+	printf("%s: %s, enable=%d, r=%d\n", __func__, dev->name, enable, ret);
 	return ret;
 }
 

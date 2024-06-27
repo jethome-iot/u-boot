@@ -95,6 +95,7 @@ Board Documentation
    beelink-gtkingpro
    jethub-j80
    jethub-j100
+   jethub-j200
    khadas-vim
    khadas-vim2
    khadas-vim3
