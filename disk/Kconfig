@@ -178,4 +178,7 @@ config AML_GPT
 	help
 	   "AML_GPT_HELP"
 
+config CUSTOM_PARTITION
+    bool "Support for custom partition table"
+
 endmenu
