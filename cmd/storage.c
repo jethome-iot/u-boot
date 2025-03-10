@@ -20,6 +20,8 @@
 #include <amlogic/asm/bl31_apis.h>
 #include <amlogic/asm/secure_apb.h>
 
+#include <display_options.h>
+
 #undef pr_info
 #define pr_info       printf
 
