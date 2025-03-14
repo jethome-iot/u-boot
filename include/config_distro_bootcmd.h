@@ -540,10 +540,16 @@
 		"setenv bootargs; " \
 		"for BOOT_SLOT in \"${BOOT_ORDER}\"; do " \
 			"if test \"x${bootargs}\" != \"x\"; then " \
+			"echo \"testing xbootargs: ${bootargs}\"; "\
 			"elif test \"x${BOOT_SLOT}\" = \"xA\"; then " \
+				"echo \"testing xBOOT_SLOT: ${BOOT_SLOT}\"; "\
+				"echo \"DEBUG: BOOT_A_LEFT=${BOOT_A_LEFT}\"; "	\
+				"echo \"DEBUG: BOOT_B_LEFT=${BOOT_B_LEFT}\"; "	\
 				"if test ${BOOT_A_LEFT} -gt 0; then " \
+					"echo \"Current BOOT_A_LEFT=${BOOT_A_LEFT}\"; " \
 					"setexpr BOOT_A_LEFT ${BOOT_A_LEFT} - 1; " \
 					"echo \"Trying to boot slot A, ${BOOT_A_LEFT} attempts remaining. Loading kernel ...\"; " \
+					"ls mmc 0:3 /boot;" \
 					"if erofsload mmc 0:3 ${kernel_addr_r} /boot/Image; then " \
 						"setenv bootargs \"${bootargs_os} ${bootargs_a} rauc.slot=A rootfstype=erofs ${bootargs_devpart} console=ttyAML0,115200n8 console=tty0\"; " \
 					"fi; " \
