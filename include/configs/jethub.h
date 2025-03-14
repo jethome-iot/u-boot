@@ -5,6 +5,8 @@
  * Author: Vyacheslav Bocharov <adeep@lexina.in>
  */
 
+#include <config_distro_bootcmd.h>
+
 #ifndef __JETHUB_CONFIG_H
 #define __JETHUB_CONFIG_H
 
@@ -18,7 +20,7 @@
 #else
 #define BOOTENV_DEV_RESCUE(devtypeu, devtypel, instance) \
 	"bootcmd_rescue=" \
-		"if test \"${userbutton}\" = \"true\"; then " \
+		"run boot_script; " \
 		"run bootcmd_mmc0; " \
 		"fi;\0"
 #endif
