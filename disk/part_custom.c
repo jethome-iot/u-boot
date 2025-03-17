@@ -41,7 +41,7 @@ static int part_get_info_custom(struct blk_desc *desc, int part, struct disk_par
 	info->sys_ind = 0x83;
 
 	strlcpy((char *)info->name, p->name, PART_NAME_LEN);
-	strlcpy((char *)info->type, "Linux", PART_TYPE_LEN);
+	strlcpy((char *)info->type, BOOT_PART_TYPE, PART_TYPE_LEN);
 
 	printf("!got request: part: %i name: %s type: %s start: %lu size: %lu bsize: %lu\n", part,
 	       info->name, info->type, info->start, info->size, info->blksz);
