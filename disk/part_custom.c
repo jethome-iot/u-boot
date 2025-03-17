@@ -43,8 +43,6 @@ static int part_get_info_custom(struct blk_desc *desc, int part, struct disk_par
 	strlcpy((char *)info->name, p->name, PART_NAME_LEN);
 	strlcpy((char *)info->type, BOOT_PART_TYPE, PART_TYPE_LEN);
 
-	printf("!got request: part: %i name: %s type: %s start: %lu size: %lu bsize: %lu\n", part,
-	       info->name, info->type, info->start, info->size, info->blksz);
 	disk_partition_clr_uuid(info);
 	disk_partition_clr_type_guid(info);
 	return 0;
