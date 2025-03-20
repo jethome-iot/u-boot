@@ -9,6 +9,7 @@
 #include <part.h>
 
 #define JRESCUE_PARTITION_COUNT 6
+#define JRESCUE_MAGIC_STRING "JRESCUE"
 
 struct partition_entry {
     char name[PART_NAME_LEN];
@@ -63,6 +64,24 @@ static int part_test_custom(struct blk_desc *desc)
 		       desc->lba * desc->blksz);
 		return -1;
 	}
+
+	unsigned long jrescue_offset = 262142;
+    unsigned char buffer[1024];
+
+	unsigned long read_count = blk_dread(desc, jrescue_offset, 2, buffer);
+
+	if (read_count != 2) {
+		printf("ERROR: Failed to read 2 sectors starting from sector %lu\n", jrescue_offset);
+		return -1;
+	}
+
+	if (memcmp(buffer, "JRESCUE", 7) != 0) {
+		printf("ERROR: Invalid data at sector %lu, expected JRESCUE magic\n", jrescue_offset);
+		return -1;
+	}
+
+	printf("SUCCESS: JRESCUE found at sector %lu\n", jrescue_offset);
+
 	return 0;
 }
 
