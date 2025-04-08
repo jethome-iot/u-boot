@@ -20,8 +20,18 @@
 #else
 #define BOOTENV_DEV_RESCUE(devtypeu, devtypel, instance) \
 	"bootcmd_rescue=" \
+		"if test \"${userbutton}\" = \"true\"; then " \
+		"echo \"Initializing USB...\"; " \
+		"usb reset; " \
+		"if test -e usb 0:1 rescue.img; then " \
+		"echo \"Rescue image found, starting recovery...\"; " \
+		"load usb 0:1 ${loadaddr} rescue.img; " \
+		"mmc write ${loadaddr} 0x30000 0x4000; " \
+		"reset; " \
+		"else " \
+		"echo \"No rescue image found, booting normally...\"; " \
 		"run boot_script; " \
-		"run bootcmd_mmc0; " \
+		"fi; " \
 		"fi;\0"
 #endif
 

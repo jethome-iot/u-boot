@@ -581,6 +581,13 @@
 		"echo \"Boot failed, resetting...\"; " \
 		"reset;\0"	\
 	\
+	"bootcmd_check_button="	\
+		"if test \"${userbutton}\" = \"true\"; then "\
+		"run bootcmd_rescue; " \
+		"else " \
+		"run boot_script; "	\
+		"fi;\0" \
+	\
 	"boot_a_script="                                                  \
 		"load ${devtype} ${devnum}:${distro_bootpart} "           \
 			"${scriptaddr} ${prefix}${script}; "              \
