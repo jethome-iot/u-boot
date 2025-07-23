@@ -152,3 +152,21 @@ U_BOOT_CMD(
 	"    - renames/moves a file/directory in 'dev' on 'interface' from\n"
 	"      'old_path' to 'new_path'"
 );
+
+static int do_gzwritefile_wrapper(struct cmd_tbl *cmdtp, int flag, int argc, char *const argv[])
+{
+	return do_gzwritefile(cmdtp, flag, argc, argv, FS_TYPE_ANY);
+}
+
+U_BOOT_CMD(
+    gzwritefile, 6, 0, do_gzwritefile_wrapper,
+    " decompress gzip file from filesystem and write to block device",
+    "<interface> [<dev[:part]> [<filename> [<target_interface> [<target_dev[:part]> [<pos> [<bytes>]]]]]]\n"
+    "  - Decompress .gz file from filesystem device and write uncompressed\n"
+    "    data to a block device.\n"
+    "    <interface>:           Source filesystem interface (e.g. mmc, usb)\n"
+    "    <dev[:part]>:          Source device and partition\n"
+    "    <filename>:            Gzip-compressed file to read\n"
+    "    <target_interface>:    Block interface to write to (e.g. mmc)\n"
+    "    <target_dev[:part]>:   Target device (e.g. 0)\n"
+);

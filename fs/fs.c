@@ -33,6 +33,8 @@
 #include <squashfs.h>
 #include <erofs.h>
 #include <exfat.h>
+#include <u-boot/zlib.h>
+#include <mmc.h>
 
 DECLARE_GLOBAL_DATA_PTR;
 
@@ -1170,4 +1172,123 @@ int fs_load_alloc(const char *ifname, const char *dev_part_str,
 	*bufp = buf;
 
 	return 0;
+}
+
+int do_gzwritefile(struct cmd_tbl *cmdtp, int flag, int argc, char *const argv[], int fstype)
+{
+	if (argc != 6) {
+		printf("Usage: gzwritefile <src_iface> <src_dev[:part]> <filename> <dst_iface> <dst_dev>\n");
+		return CMD_RET_USAGE;
+	}
+
+	const char *src_iface   = argv[1];
+	const char *src_devpart = argv[2];
+	const char *filename    = argv[3];
+	const char *dst_iface   = argv[4];
+	const char *dst_dev     = argv[5];
+
+	printf("[gzwritefile] Source FS:  %s %s\n", src_iface, src_devpart);
+	printf("[gzwritefile] File:       %s\n", filename);
+	printf("[gzwritefile] Target DEV: %s %s (RAW write)\n", dst_iface, dst_dev);
+
+	if (fs_set_blk_dev(src_iface, src_devpart, FS_TYPE_ANY)) {
+		printf("ERROR: fs_set_blk_dev failed\n");
+		return CMD_RET_FAILURE;
+	}
+
+	loff_t filesize = 0;
+	if (fs_size(filename, &filesize)) {
+		printf("ERROR: Can't get file size: %s\n", filename);
+		return CMD_RET_FAILURE;
+	}
+	printf("[gzwritefile] Compressed file size: %llu bytes\n", filesize);
+
+	struct blk_desc *dst_blk;
+	if (blk_get_device_by_str(dst_iface, dst_dev, &dst_blk) < 0 || !dst_blk) {
+		printf("ERROR: Failed to resolve target block device\n");
+		return CMD_RET_FAILURE;
+	}
+	printf("[gzwritefile] Target is RAW device, writing from LBA 0\n");
+
+	const int chunk_size = 4 * 1024 * 1024; // 4 MB
+	ulong addr = env_get_ulong("loadaddr", 16, CONFIG_SYS_LOAD_ADDR);
+	uint8_t *inbuf  = (uint8_t *)addr;
+	uint8_t *outbuf = (uint8_t *)(addr + chunk_size);
+
+	z_stream stream;
+	memset(&stream, 0, sizeof(stream));
+	if (inflateInit2(&stream, 15 + 16) != Z_OK) {
+		printf("ERROR: inflateInit2 failed\n");
+		return CMD_RET_FAILURE;
+	}
+
+	loff_t offset = 0;
+	lbaint_t cur_lba = 0;
+	loff_t total_out = 0;
+	int done = 0;
+	int rd;
+
+	while (!done && offset < filesize) {
+		int readlen = chunk_size;
+		if (filesize - offset < readlen)
+			readlen = filesize - offset;
+
+		loff_t actual = 0;
+		rd = fat_read_file(filename, inbuf, offset, readlen, &actual);
+		if (rd || actual == 0) {
+			printf("ERROR: fat_read_file failed or read 0 bytes at offset 0x%llx (rc=%d)\n", offset, rd);
+			inflateEnd(&stream);
+			return CMD_RET_FAILURE;
+		}
+		offset += actual;
+
+		stream.next_in = inbuf;
+		stream.avail_in = actual;
+
+		printf("[gzwritefile] Inflating chunk...\n");
+
+		while (stream.avail_in > 0) {
+			stream.next_out = outbuf;
+			stream.avail_out = chunk_size;
+
+			int zret = inflate(&stream, Z_NO_FLUSH);
+			printf("[gzwritefile] Z status: %d, avail_in: %u, avail_out: %u\n",
+			       zret, stream.avail_in, stream.avail_out);
+
+			if (zret == Z_STREAM_END)
+				done = 1;
+			else if (zret != Z_OK) {
+				printf("ERROR: inflate failed with code %d\n", zret);
+				inflateEnd(&stream);
+				return CMD_RET_FAILURE;
+			}
+
+			int outlen = chunk_size - stream.avail_out;
+			if (outlen > 0) {
+				int blocks = (outlen + 511) / 512;
+				if (outlen % 512)
+					memset(outbuf + outlen, 0, blocks * 512 - outlen);
+
+				printf("[gzwritefile] Writing %d bytes (%d blocks) to LBA 0x%lx\n",
+				       outlen, blocks, cur_lba);
+
+				if (blk_dwrite(dst_blk, cur_lba, blocks, outbuf) != blocks) {
+					printf("ERROR: blk_dwrite failed at LBA 0x%lx\n", cur_lba);
+					inflateEnd(&stream);
+					return CMD_RET_FAILURE;
+				}
+
+				cur_lba += blocks;
+				total_out += outlen;
+			}
+		}
+	}
+
+	printf("[gzwritefile] Decompression finished\n");
+	printf("[gzwritefile] DONE: wrote %llu bytes (%lu blocks)\n", total_out, cur_lba);
+
+	env_set_hex("gzfilesize", total_out);
+
+	inflateEnd(&stream);
+	return CMD_RET_SUCCESS;
 }
