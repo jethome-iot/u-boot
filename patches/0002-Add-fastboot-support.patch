@@ -1,0 +1,68 @@
+From ad8c63ce30b9fa9782dd4e81e57f9211fc5637f3 Mon Sep 17 00:00:00 2001
+From: Nikita Maslo <nikitamalco203@gmail.com>
+Date: Fri, 5 Sep 2025 13:51:20 +0300
+Subject: [PATCH] add fastboot support
+
+---
+ .../meson-sm1-jethome-jethub-j200-u-boot.dtsi   | 17 +++++++++++++++++
+ configs/jethub_j200_defconfig                   |  6 ++++++
+ 2 files changed, 23 insertions(+)
+
+diff --git a/arch/arm/dts/meson-sm1-jethome-jethub-j200-u-boot.dtsi b/arch/arm/dts/meson-sm1-jethome-jethub-j200-u-boot.dtsi
+index a6f11e8cdfb..6a1da412841 100644
+--- a/arch/arm/dts/meson-sm1-jethome-jethub-j200-u-boot.dtsi
++++ b/arch/arm/dts/meson-sm1-jethome-jethub-j200-u-boot.dtsi
+@@ -11,3 +11,20 @@
+ &spifc {
+ 	status = "okay";
+ };
++
++&usb {
++	status = "okay";
++	dr_mode = "peripheral";
++	/delete-property/ vbus-supply;
++};
++
++&dwc2 {
++	status = "okay";
++	phys = <&usb2_phy1>;
++	phy-names = "usb2-phy";
++	dr_mode = "peripheral";
++};
++
++&dwc3 {
++	status = "disabled";
++};
+\ No newline at end of file
+diff --git a/configs/jethub_j200_defconfig b/configs/jethub_j200_defconfig
+index 3ae5d885c58..efdb8fa1aa6 100644
+--- a/configs/jethub_j200_defconfig
++++ b/configs/jethub_j200_defconfig
+@@ -54,6 +54,7 @@ CONFIG_DM_MTD=y
+ CONFIG_DM_SPI_FLASH=y
+ CONFIG_SPI_FLASH_WINBOND=y
+ CONFIG_SPI_FLASH_XTX=y
++CONFIG_SPI_FLASH_SFDP_SUPPORT=y
+ CONFIG_PHY_REALTEK=y
+ CONFIG_DM_MDIO=y
+ CONFIG_DM_MDIO_MUX=y
+@@ -78,6 +79,7 @@ CONFIG_MESON_SPIFC=y
+ CONFIG_SYSINFO=y
+ CONFIG_SYSINFO_SMBIOS=y
+ CONFIG_USB=y
++CONFIG_DM_USB=y
+ CONFIG_DM_USB_GADGET=y
+ CONFIG_USB_XHCI_HCD=y
+ CONFIG_USB_XHCI_DWC3=y
+@@ -117,3 +119,7 @@ CONFIG_AML_PARTITION=y
+ 
+ CONFIG_GPIO_HOG=y
+ CONFIG_CMD_SPI=y
++CONFIG_FASTBOOT=y
++CONFIG_USB_FUNCTION_FASTBOOT=y
++CONFIG_FASTBOOT_BUF_ADDR=0x48000000
++CONFIG_FASTBOOT_BUF_SIZE=0x02000000
+\ No newline at end of file
+-- 
+2.43.0
+
