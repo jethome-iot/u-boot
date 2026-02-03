@@ -146,7 +146,7 @@
 
 /* eMMC - disabled to allow SPI NOR access (shared pins) */
 &sd_emmc_c {
-	status = "disabled";
+	status = "okay";
 	pinctrl-0 = <&emmc_pins>;
 	pinctrl-names = "default";
 
@@ -203,12 +203,12 @@
 };
 
 &spi_nfc {
-	status = "okay";
+	status = "disable";
 	pinctrl-0 = <&spi_nfc_pins>;
 	pinctrl-names = "default";
 
 	flash@0 {
-		status = "okay";
+		status = "disable";
 		compatible = "jedec,spi-nor";
 		reg = <0>;
 		spi-max-frequency = <10000000>; /* 10 MHz */
