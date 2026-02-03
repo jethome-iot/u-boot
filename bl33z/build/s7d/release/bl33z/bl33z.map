@@ -1,0 +1,297 @@
+
+Discarded input sections
+
+ .text          0x0000000000000000        0x0 build/s7d/release/bl33z/build_message.o
+ .data          0x0000000000000000        0x0 build/s7d/release/bl33z/build_message.o
+ .bss           0x0000000000000000        0x0 build/s7d/release/bl33z/build_message.o
+ .rodata.build_message
+                0x0000000000000000       0x36 build/s7d/release/bl33z/build_message.o
+ .comment       0x0000000000000000       0x46 build/s7d/release/bl33z/build_message.o
+ .text          0x0000000000000000        0x0 build/s7d/release/bl33z/bl33z_main.o
+ .data          0x0000000000000000        0x0 build/s7d/release/bl33z/bl33z_main.o
+ .bss           0x0000000000000000        0x0 build/s7d/release/bl33z/bl33z_main.o
+ .text          0x0000000000000000        0x0 build/s7d/release/bl33z/cache_v8.o
+ .data          0x0000000000000000        0x0 build/s7d/release/bl33z/cache_v8.o
+ .bss           0x0000000000000000        0x0 build/s7d/release/bl33z/cache_v8.o
+ .text.set_pgtable_section
+                0x0000000000000000       0x14 build/s7d/release/bl33z/cache_v8.o
+ .text.invalidate_dcache_all
+                0x0000000000000000        0x4 build/s7d/release/bl33z/cache_v8.o
+ .text.flush_dcache_all
+                0x0000000000000000        0x4 build/s7d/release/bl33z/cache_v8.o
+ .text          0x0000000000000000        0x0 build/s7d/release/bl33z/mem.o
+ .data          0x0000000000000000        0x0 build/s7d/release/bl33z/mem.o
+ .bss           0x0000000000000000        0x0 build/s7d/release/bl33z/mem.o
+ .text.memcmp   0x0000000000000000       0x34 build/s7d/release/bl33z/mem.o
+ .text.memmove  0x0000000000000000       0x34 build/s7d/release/bl33z/mem.o
+ .text.memchr   0x0000000000000000       0x28 build/s7d/release/bl33z/mem.o
+ .text          0x0000000000000000        0x0 build/s7d/release/bl33z/lz4_compress.o
+ .data          0x0000000000000000        0x0 build/s7d/release/bl33z/lz4_compress.o
+ .bss           0x0000000000000000        0x0 build/s7d/release/bl33z/lz4_compress.o
+ .text          0x0000000000000000        0x0 build/s7d/release/bl33z/ram_compress.o
+ .data          0x0000000000000000        0x0 build/s7d/release/bl33z/ram_compress.o
+ .bss           0x0000000000000000        0x0 build/s7d/release/bl33z/ram_compress.o
+ .text.watchdog_ping
+                0x0000000000000000        0x4 build/s7d/release/bl33z/ram_compress.o
+ .text.print_process
+                0x0000000000000000        0x4 build/s7d/release/bl33z/ram_compress.o
+ .text.print_acs_ramdump_para
+                0x0000000000000000        0x4 build/s7d/release/bl33z/ram_compress.o
+ .text          0x0000000000000000        0x0 build/s7d/release/bl33z/serial.o
+ .data          0x0000000000000000        0x0 build/s7d/release/bl33z/serial.o
+ .bss           0x0000000000000000        0x0 build/s7d/release/bl33z/serial.o
+ .text.serial_disable
+                0x0000000000000000       0x14 build/s7d/release/bl33z/serial.o
+ .text.serial_tx_is_empty
+                0x0000000000000000       0x14 build/s7d/release/bl33z/serial.o
+ .text.serial_init
+                0x0000000000000000       0x7c build/s7d/release/bl33z/serial.o
+ .text.plat_serial_setup
+                0x0000000000000000        0x8 build/s7d/release/bl33z/serial.o
+ .text.serial_tstc
+                0x0000000000000000       0x14 build/s7d/release/bl33z/serial.o
+ .text.serial_getc
+                0x0000000000000000       0x60 build/s7d/release/bl33z/serial.o
+ .text.bl2_print
+                0x0000000000000000       0x4c build/s7d/release/bl33z/serial.o
+ .bss.g_serial_disable
+                0x0000000000000000        0x4 build/s7d/release/bl33z/serial.o
+ .text          0x0000000000000000        0x0 build/s7d/release/bl33z/timer.o
+ .data          0x0000000000000000        0x0 build/s7d/release/bl33z/timer.o
+ .bss           0x0000000000000000        0x0 build/s7d/release/bl33z/timer.o
+ .text.get_time
+                0x0000000000000000       0x10 build/s7d/release/bl33z/timer.o
+ .text          0x0000000000000000        0x0 build/s7d/release/bl33z/watchdog.o
+ .data          0x0000000000000000        0x0 build/s7d/release/bl33z/watchdog.o
+ .bss           0x0000000000000000        0x0 build/s7d/release/bl33z/watchdog.o
+ .text.watchdog_init
+                0x0000000000000000       0x30 build/s7d/release/bl33z/watchdog.o
+ .text.watchdog_reset
+                0x0000000000000000       0x10 build/s7d/release/bl33z/watchdog.o
+ .text.reset_system
+                0x0000000000000000       0x50 build/s7d/release/bl33z/watchdog.o
+ .data          0x0000000000000000        0x0 build/s7d/release/bl33z/bl33z_entrypoint.o
+ .bss           0x0000000000000000        0x0 build/s7d/release/bl33z/bl33z_entrypoint.o
+ .data          0x0000000000000000        0x0 build/s7d/release/bl33z/cache_el2.o
+ .bss           0x0000000000000000        0x0 build/s7d/release/bl33z/cache_el2.o
+
+Memory Configuration
+
+Name             Origin             Length             Attributes
+RAM              0x0000000000400000 0x0000000000004000 xrw
+STACK            0x0000000000600000 0x0000000000010000 xrw
+*default*        0x0000000000000000 0xffffffffffffffff
+
+Linker script and memory map
+
+                0x0000000000400000                . = 0x400000
+                0x0000000000400000                . = ALIGN (0x8)
+
+ro              0x0000000000400000     0x26a8
+                0x0000000000400000                __RO_START__ = .
+ *bl33z_entrypoint.o(.text*)
+ .text          0x0000000000400000       0xc8 build/s7d/release/bl33z/bl33z_entrypoint.o
+                0x0000000000400000                bl33z_entrypoint
+                0x000000000040000c                bl33z_entry
+                0x0000000000400080                zeromem16
+ *(.text*)
+ .text.bl33z_main
+                0x00000000004000c8       0x3c build/s7d/release/bl33z/bl33z_main.o
+                0x00000000004000c8                bl33z_main
+ .text.enable_dcache
+                0x0000000000400104      0x194 build/s7d/release/bl33z/cache_v8.o
+                0x0000000000400104                enable_dcache
+ .text.disable_dcache
+                0x0000000000400298       0x30 build/s7d/release/bl33z/cache_v8.o
+                0x0000000000400298                disable_dcache
+ .text.enable_icache
+                0x00000000004002c8       0x1c build/s7d/release/bl33z/cache_v8.o
+                0x00000000004002c8                enable_icache
+ .text.disable_icache
+                0x00000000004002e4       0x1c build/s7d/release/bl33z/cache_v8.o
+                0x00000000004002e4                disable_icache
+ .text.enable_caches
+                0x0000000000400300       0x24 build/s7d/release/bl33z/cache_v8.o
+                0x0000000000400300                enable_caches
+ .text.disable_caches
+                0x0000000000400324       0x14 build/s7d/release/bl33z/cache_v8.o
+                0x0000000000400324                disable_caches
+ .text.memset   0x0000000000400338       0x1c build/s7d/release/bl33z/mem.o
+                0x0000000000400338                memset
+ .text.memcpy   0x0000000000400354       0x20 build/s7d/release/bl33z/mem.o
+                0x0000000000400354                memcpy
+ .text.lz4_compress
+                0x0000000000400374      0x790 build/s7d/release/bl33z/lz4_compress.o
+                0x0000000000400374                lz4_compress
+ .text.ramdump_save_ddr_md5_info.constprop.0.isra.0
+                0x0000000000400b04      0x190 build/s7d/release/bl33z/ram_compress.o
+ .text.ram_compress_all
+                0x0000000000400c94      0x75c build/s7d/release/bl33z/ram_compress.o
+                0x0000000000400c94                ram_compress_all
+ .text.get_reboot_mode
+                0x00000000004013f0       0x14 build/s7d/release/bl33z/ram_compress.o
+                0x00000000004013f0                get_reboot_mode
+ .text.check_reboot_reason
+                0x0000000000401404       0xd4 build/s7d/release/bl33z/ram_compress.o
+                0x0000000000401404                check_reboot_reason
+ .text.save_ramp_dump
+                0x00000000004014d8       0xc0 build/s7d/release/bl33z/ram_compress.o
+                0x00000000004014d8                save_ramp_dump
+ .text.ramdump_compress_all
+                0x0000000000401598      0x4c8 build/s7d/release/bl33z/ram_compress.o
+                0x0000000000401598                ramdump_compress_all
+ .text.get_bl2e_ttbr_tcr_mair
+                0x0000000000401a60       0x94 build/s7d/release/bl33z/ram_compress.o
+                0x0000000000401a60                get_bl2e_ttbr_tcr_mair
+ .text.set_bl2e_ttbr_tcr_mair
+                0x0000000000401af4       0x34 build/s7d/release/bl33z/ram_compress.o
+                0x0000000000401af4                set_bl2e_ttbr_tcr_mair
+ .text.aml_ramdump_compress
+                0x0000000000401b28      0x14c build/s7d/release/bl33z/ram_compress.o
+                0x0000000000401b28                aml_ramdump_compress
+ .text.serial_putc
+                0x0000000000401c74       0x30 build/s7d/release/bl33z/serial.o
+                0x0000000000401c74                serial_putc
+ .text.serial_puts
+                0x0000000000401ca4       0x30 build/s7d/release/bl33z/serial.o
+                0x0000000000401ca4                serial_puts
+ .text.serial_put_hex
+                0x0000000000401cd4       0x48 build/s7d/release/bl33z/serial.o
+                0x0000000000401cd4                serial_put_hex
+ .text.serial_put_dec
+                0x0000000000401d1c       0x70 build/s7d/release/bl33z/serial.o
+                0x0000000000401d1c                serial_put_dec
+ .text._udelay  0x0000000000401d8c       0x20 build/s7d/release/bl33z/timer.o
+                0x0000000000401d8c                _udelay
+ .text.timer_start
+                0x0000000000401dac       0x18 build/s7d/release/bl33z/timer.o
+                0x0000000000401dac                timer_start
+ .text.timer_end
+                0x0000000000401dc4       0x58 build/s7d/release/bl33z/timer.o
+                0x0000000000401dc4                timer_end
+ .text.watchdog_disable
+                0x0000000000401e1c       0x1c build/s7d/release/bl33z/watchdog.o
+                0x0000000000401e1c                watchdog_disable
+ .text          0x0000000000401e38      0x1f0 build/s7d/release/bl33z/cache_el2.o
+                0x0000000000401e38                __asm_get_sctlr
+                0x0000000000401e40                __asm_set_sctlr
+                0x0000000000401e4c                __asm_get_currentel
+                0x0000000000401e54                __asm_get_ttbr
+                0x0000000000401e5c                __asm_get_tcr
+                0x0000000000401e64                __asm_get_mair
+                0x0000000000401e6c                __asm_set_ttbr_tcr_mair
+                0x0000000000401e84                __asm_invalidate_tlb_all
+                0x0000000000401ed0                __asm_flush_dcache_level
+                0x0000000000401f58                __asm_dcache_all
+                0x0000000000401fb8                __asm_flush_dcache_all
+                0x0000000000401fcc                __asm_invalidate_dcache_all
+                0x0000000000401fe0                __asm_flush_dcache_range
+                0x0000000000402014                __asm_invalidate_icache_all
+                0x0000000000402020                get_sctrl
+ *(.rodata*)
+ .rodata.bl33z_main.str1.1
+                0x0000000000402028      0x67d build/s7d/release/bl33z/bl33z_main.o
+                                         0x37 (size before relaxing)
+ .rodata.enable_dcache.str1.1
+                0x00000000004026a5       0x69 build/s7d/release/bl33z/cache_v8.o
+ .rodata.lz4_compress.str1.1
+                0x00000000004026a5       0x19 build/s7d/release/bl33z/lz4_compress.o
+ .rodata.ramdump_save_ddr_md5_info.constprop.0.isra.0.str1.1
+                0x00000000004026a5       0x4f build/s7d/release/bl33z/ram_compress.o
+ .rodata.ram_compress_all.str1.1
+                0x00000000004026a5      0x1ff build/s7d/release/bl33z/ram_compress.o
+ .rodata.check_reboot_reason.str1.1
+                0x00000000004026a5       0x25 build/s7d/release/bl33z/ram_compress.o
+ .rodata.save_ramp_dump.str1.1
+                0x00000000004026a5       0x49 build/s7d/release/bl33z/ram_compress.o
+ .rodata.ramdump_compress_all.str1.1
+                0x00000000004026a5      0x20d build/s7d/release/bl33z/ram_compress.o
+ .rodata.get_bl2e_ttbr_tcr_mair.str1.1
+                0x00000000004026a5       0x3c build/s7d/release/bl33z/ram_compress.o
+ .rodata.set_bl2e_ttbr_tcr_mair.str1.1
+                0x00000000004026a5       0x2b build/s7d/release/bl33z/ram_compress.o
+ .rodata.aml_ramdump_compress.str1.1
+                0x00000000004026a5       0x9d build/s7d/release/bl33z/ram_compress.o
+ .rodata.timer_end.str1.1
+                0x00000000004026a5        0xd build/s7d/release/bl33z/timer.o
+ *(.vectors)
+                0x00000000004026a5                __RO_END_UNALIGNED__ = .
+                0x00000000004028b8                . = NEXT (0x8)
+ *fill*         0x00000000004026a5        0x3 
+                0x00000000004026a8                __RO_END__ = .
+
+.iplt           0x00000000004026a8        0x0
+ .iplt          0x00000000004026a8        0x0 build/s7d/release/bl33z/bl33z_main.o
+
+.rela.dyn       0x00000000004026a8        0x0
+ .rela.iplt     0x00000000004026a8        0x0 build/s7d/release/bl33z/bl33z_main.o
+ .rela.text     0x00000000004026a8        0x0 build/s7d/release/bl33z/bl33z_main.o
+
+.data           0x00000000004026a8      0x150
+                0x00000000004026a8                __DATA_START__ = .
+ *(.data*)
+ .data.debug_enable
+                0x00000000004026a8        0x1 build/s7d/release/bl33z/bl33z_main.o
+                0x00000000004026a8                debug_enable
+ *fill*         0x00000000004026a9        0x7 
+ .data.ram_compress_data
+                0x00000000004026b0      0x118 build/s7d/release/bl33z/bl33z_main.o
+                0x00000000004026b0                ram_compress_data
+ .data.rcwi     0x00000000004027c8       0x30 build/s7d/release/bl33z/ram_compress.o
+                0x00000000004027f8                __DATA_END__ = .
+                0x00000000004027f8                MARK_ADDR = .
+
+.igot.plt       0x00000000004027f8        0x0
+ .igot.plt      0x00000000004027f8        0x0 build/s7d/release/bl33z/bl33z_main.o
+
+stacks          0x0000000000600000        0x0
+                0x0000000000600000                __STACKS_START__ = .
+ *(tzfw_normal_stacks)
+                0x0000000000600000                __STACKS_END__ = .
+                0x00000000004027f8                . = MARK_ADDR
+
+.bss            0x00000000004027f8       0x20
+                0x00000000004027f8                __BSS_START__ = .
+ *(SORT_BY_ALIGNMENT(.bss*))
+ .bss.bl2e_mair
+                0x00000000004027f8        0x8 build/s7d/release/bl33z/ram_compress.o
+                0x00000000004027f8                bl2e_mair
+ .bss.bl2e_tcr  0x0000000000402800        0x8 build/s7d/release/bl33z/ram_compress.o
+                0x0000000000402800                bl2e_tcr
+ .bss.bl2e_ttbr
+                0x0000000000402808        0x8 build/s7d/release/bl33z/ram_compress.o
+                0x0000000000402808                bl2e_ttbr
+ .bss.time_end  0x0000000000402810        0x4 build/s7d/release/bl33z/timer.o
+                0x0000000000402810                time_end
+ .bss.time_start
+                0x0000000000402814        0x4 build/s7d/release/bl33z/timer.o
+                0x0000000000402814                time_start
+ *(COMMON)
+                0x0000000000402818                __BSS_END__ = .
+                0x0000000000402818                __BL33Z_END__ = .
+                0x0000000000000020                __BSS_SIZE__ = SIZEOF (.bss)
+                0x0000000000000001                ASSERT ((. <= 0x404000), BL33Z image has exceeded its limit.)
+LOAD build/s7d/release/bl33z/build_message.o
+LOAD build/s7d/release/bl33z/bl33z_main.o
+LOAD build/s7d/release/bl33z/cache_v8.o
+LOAD build/s7d/release/bl33z/mem.o
+LOAD build/s7d/release/bl33z/lz4_compress.o
+LOAD build/s7d/release/bl33z/ram_compress.o
+LOAD build/s7d/release/bl33z/serial.o
+LOAD build/s7d/release/bl33z/timer.o
+LOAD build/s7d/release/bl33z/watchdog.o
+LOAD build/s7d/release/bl33z/bl33z_entrypoint.o
+LOAD build/s7d/release/bl33z/cache_el2.o
+OUTPUT(build/s7d/release/bl33z/bl33z.elf elf64-littleaarch64)
+LOAD linker stubs
+
+.comment        0x0000000000000000       0x45
+ .comment       0x0000000000000000       0x45 build/s7d/release/bl33z/bl33z_main.o
+                                         0x46 (size before relaxing)
+ .comment       0x0000000000000045       0x46 build/s7d/release/bl33z/cache_v8.o
+ .comment       0x0000000000000045       0x46 build/s7d/release/bl33z/mem.o
+ .comment       0x0000000000000045       0x46 build/s7d/release/bl33z/lz4_compress.o
+ .comment       0x0000000000000045       0x46 build/s7d/release/bl33z/ram_compress.o
+ .comment       0x0000000000000045       0x46 build/s7d/release/bl33z/serial.o
+ .comment       0x0000000000000045       0x46 build/s7d/release/bl33z/timer.o
+ .comment       0x0000000000000045       0x46 build/s7d/release/bl33z/watchdog.o
