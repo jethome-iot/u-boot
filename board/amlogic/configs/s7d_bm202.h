@@ -109,19 +109,7 @@
 		"\0"\
 	"cc_enable=1\0"\
 
-#ifndef CONFIG_PXP_DDR
-#define CONFIG_PREBOOT  \
-		"run bcb_cmd; "\
-		"run upgrade_check;"\
-		"run init_display;"\
-		"run storeargs;"\
-		"run upgrade_key;" \
-		"bcb uboot-command;"\
-		"run switch_bootmode;"
-#else
-#define CONFIG_PREBOOT  "echo preboot"
-#define CONFIG_ENV_IS_NOWHERE  1
-#endif
+#define CONFIG_PREBOOT  "echo JetHub J300 boot"
 //#define CONFIG_ENV_SIZE   (64 * 1024)
 #define CONFIG_FIT 1
 #define CONFIG_OF_LIBFDT 1
