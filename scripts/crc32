@@ -1,0 +1,13 @@
+#!/usr/bin/env python3
+# Simple crc32 replacement using Python
+import sys
+import binascii
+
+if len(sys.argv) < 2:
+    print("Usage: crc32 <file>", file=sys.stderr)
+    sys.exit(1)
+
+with open(sys.argv[1], 'rb') as f:
+    data = f.read()
+    crc = binascii.crc32(data) & 0xffffffff
+    print(f"{crc:08x}")
