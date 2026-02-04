@@ -89,6 +89,6 @@ CONFIG_SPI_FLASH_MICRON=y
 CONFIG_EFUSE=y
 
 CONFIG_USE_BOOTCOMMAND=y
-CONFIG_BOOTCOMMAND="setenv devtype mmc; setenv devnum 1; if load mmc 1 0x12000000 boot/boot.scr; then source 0x12000000; fi"
+CONFIG_BOOTCOMMAND="setenv devtype mmc; setenv devnum 0; if load mmc 0 0x12000000 boot/boot.scr; then source 0x12000000; else setenv devnum 1; load mmc 1 0x12000000 boot/boot.scr && source 0x12000000; fi"
 CONFIG_USE_PREBOOT=y
 CONFIG_PREBOOT="echo Armbian boot"
