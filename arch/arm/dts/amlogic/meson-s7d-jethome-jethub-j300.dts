@@ -20,8 +20,8 @@
 	aliases {
 		serial0 = &uart_b;
 		ethernet0 = &ethmac;
-		mmc0 = &sd_emmc_c;  /* eMMC */
-        mmc1 = &sd_emmc_b;  /* SD card */
+		mmc0 = &sd_emmc_b;  /* SD card */
+        mmc1 = &sd_emmc_c;  /* eMMC */
 	};
 
 	chosen {
