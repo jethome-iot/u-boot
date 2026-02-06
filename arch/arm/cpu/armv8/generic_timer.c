@@ -19,9 +19,15 @@ DECLARE_GLOBAL_DATA_PTR;
  */
 unsigned long get_tbclk(void)
 {
+#if defined(CONFIG_COUNTER_FREQUENCY) && CONFIG_COUNTER_FREQUENCY > 0
+	/* Use configured frequency instead of cntfrq_el0 register
+	 * to work around BL31 setting incorrect value */
+	return CONFIG_COUNTER_FREQUENCY;
+#else
 	unsigned long cntfrq;
 	asm volatile("mrs %0, cntfrq_el0" : "=r" (cntfrq));
 	return cntfrq;
+#endif
 }
 
 #ifdef CONFIG_SYS_FSL_ERRATUM_A008585
