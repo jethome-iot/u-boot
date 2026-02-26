@@ -747,6 +747,12 @@ config S7D_BM202
 	help
 		Select S7D BM202 config
 
+config JETHUB_J300
+	bool "JETHUB_J300"
+	select TARGET_JETHUB_J300
+	help
+		Select JetHub J300 (S7D) config
+
 config S7D_BM209
 	bool "S7D_BM209"
 	select TARGET_S7D_BM209
@@ -772,6 +778,10 @@ config TARGET_S7D_BM201
 config TARGET_S7D_BM202
 	bool "S7D BM202 board"
 	depends on S7D_BM202
+
+config TARGET_JETHUB_J300
+	bool "JetHub J300 board"
+	depends on JETHUB_J300
 
 config TARGET_S7D_BM209
 	bool "S7D BM209 board"
@@ -950,6 +960,8 @@ source "board/amlogic/s7d_skt/Kconfig"
 source "board/amlogic/s7d_bm201/Kconfig"
 
 source "board/amlogic/s7d_bm202/Kconfig"
+
+source "board/amlogic/jethub_j300/Kconfig"
 
 source "board/amlogic/s7d_bm209/Kconfig"
 

@@ -1,0 +1,34 @@
+if TARGET_JETHUB_J300
+
+config SYS_SOC
+	default "s7d"
+
+config SYS_BOARD
+	default "jethub_j300"
+
+config SYS_CONFIG_NAME
+	default "jethub_j300"
+
+config DTB_BIND_KERNEL
+    bool "load dtb from boot part but not flash rsv"
+    default n
+
+config BL30_SELECT
+	string "s7d BL30 board config"
+		default "s7d_bm202"
+
+config AML_REBOOT
+		bool "reboot cmd"
+		default y
+		help
+			support uboot reboot cmd
+
+config ENABLE_AML_GPIO_UPGRADE
+    bool "upgrade key check"
+    default n
+
+config AML_GPIO_UPGRADE_KEY
+    string "gpio key"
+    default ""
+
+endif

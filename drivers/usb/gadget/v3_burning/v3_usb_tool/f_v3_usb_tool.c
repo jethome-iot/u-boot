@@ -935,12 +935,12 @@ static void cb_oem_cmd(struct usb_ep *ep, struct usb_request *req)
 		FB_MSG("IS_FEAT_BOOT_VERIFY 0x%x\n", IS_FEAT_BOOT_VERIFY());
 		ret = _mread_cmd_parser(argc, argv, ack);
 	} else if (!strcmp("key", argv[0])) {
-		if (IS_ENABLED(CONFIG_V3_KEY_BURNING_SUPPORT)) {
-			ret = v2_key_command(argc, argv, ack);
-		} else {
-			FB_MSG("CONFIG_V3_KEY_BURNING_SUPPORT not enabled\n");
-			ret = 1;
-		}
+#ifdef CONFIG_V3_KEY_BURNING_SUPPORT
+		ret = v2_key_command(argc, argv, ack);
+#else
+		FB_MSG("CONFIG_V3_KEY_BURNING_SUPPORT not enabled\n");
+		ret = 1;
+#endif
 	} else if (!strcmp("disk_initial", argv[0])) {
 		int toErase = argc > 1 ? simple_strtoul(argv[1], NULL, 0) : 0;
 		int dtbImgSz = (_memDtbImg[0].hadDown == 0x1b8e) ? _memDtbImg[0].imgSize : 0;
