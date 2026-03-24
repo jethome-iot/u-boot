@@ -57,6 +57,30 @@
 	"boot_part=boot\0"\
 	"Irq_check_en=0\0"\
 	"cc_enable=1\0"\
+	"devtype=mmc\0"\
+	"devnum=1\0"\
+	"board=jethub_j300\0"\
+	"board_name=jethub_j300\0"\
+	"fdtfile=amlogic/meson-s7d-jethub-j300.dtb\0"\
+	"common_dtb_load="\
+		"load mmc 1:1 ${dtb_mem_addr} boot/dtb/${fdtfile} || "\
+		"load mmc 1:1 ${dtb_mem_addr} boot/dtbs/${fdtfile} || "\
+		"load mmc 0 ${dtb_mem_addr} boot/dtb/${fdtfile}\0"\
+	"create_mbr="\
+		"mmc dev 1; "\
+		"mw.b 0x1000000 0x00 0x200; "\
+		"setexpr mbr_t 0x1000000 + 0x1b8; mw.l ${mbr_t} 0x4a333030; "\
+		"setexpr mbr_t 0x1000000 + 0x1c2; mw.b ${mbr_t} 0x83 1; "\
+		"setexpr mbr_t 0x1000000 + 0x1c6; mw.l ${mbr_t} 0x00066000; "\
+		"setexpr mbr_t 0x1000000 + 0x1ca; mw.l ${mbr_t} 0x07500000; "\
+		"setexpr mbr_t 0x1000000 + 0x1fe; mw.b ${mbr_t} 0x55 1; "\
+		"setexpr mbr_t 0x1000000 + 0x1ff; mw.b ${mbr_t} 0xaa 1; "\
+		"mmc write 0x1000000 0 1; "\
+		"echo MBR written\0"\
+	"bootcmd="\
+		"run create_mbr; "\
+		"load mmc 1:1 0x12000000 boot/boot.scr && source 0x12000000; "\
+		"echo Boot failed\0"\
 
 #define CONFIG_PREBOOT  "echo JetHub J300 boot"
 
