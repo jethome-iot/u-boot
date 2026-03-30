@@ -24,7 +24,9 @@
 
 DECLARE_GLOBAL_DATA_PTR;
 /* using mbr*/
+#ifndef CONFIG_PTBL_MBR
 #define CONFIG_PTBL_MBR	(0)
+#endif
 #if (CONFIG_PTBL_MBR)
 	/* cmpare partition name? */
 	#define CONFIG_CMP_PARTNAME	(0)
@@ -1056,23 +1058,26 @@ static int _construct_mbr_entry(struct _iptbl *p_iptbl, struct dos_partition *p_
 	uint64_t primary_size = 0;
 	uint64_t extended_size = 0;
 	int i;
-	/* the entry is active or not */
+
 	p_entry->boot_ind = 0x00;
 
-	if (part_num == 3) {/* the logic partition entry */
-		/* the entry type */
+	if (part_num >= p_iptbl->count) {
+		memset(p_entry, 0, sizeof(*p_entry));
+		return 0;
+	}
+
+	if (part_num == 3) {
 		p_entry->sys_ind = 0x05;
 		start_offset = (p_iptbl->partitions[3].offset - PARTITION_RESERVED) >> 9;
-		for ( i = 3;i< p_iptbl->count;i++)
+		for (i = 3; i < p_iptbl->count; i++)
 			extended_size = p_iptbl->partitions[i].size >> 9;
 
 		memcpy((unsigned char *)p_entry->start4, &start_offset, 4);
 		memcpy((unsigned char *)p_entry->size4, &extended_size, 4);
-	}else{/* the primary partition entry */
-		/* the entry type */
+	} else {
 		p_entry->sys_ind = 0x83;
 		start_offset = (p_iptbl->partitions[part_num].offset) >> 9;
-		primary_size = (p_iptbl->partitions[part_num].size)>>9;
+		primary_size = (p_iptbl->partitions[part_num].size) >> 9;
 		memcpy((unsigned char *)p_entry->start4, &start_offset, 4);
 		memcpy((unsigned char *)p_entry->size4, &primary_size, 4);
 	}
@@ -1113,21 +1118,59 @@ static __attribute__((unused)) int _update_ptbl_mbr(struct mmc *mmc, struct _ipt
 	unsigned char *src;
 	int i;
 	struct dos_mbr_or_ebr *mbr;
-	struct _iptbl *ptb ;
+	struct _iptbl *ptb;
+	int inh_count = get_emmc_partition_arraysize();
 
-	ptb = p_iptbl;
+	ptb = (struct _iptbl *)malloc(sizeof(struct _iptbl));
+	if (!ptb)
+		return -ENOMEM;
+
+	if (p_iptbl->count <= inh_count) {
+		apt_err("error: not enough partitions (have %d, inherent %d)\n",
+			p_iptbl->count, inh_count);
+		free(ptb);
+		return -1;
+	}
+
+	ptb->count = p_iptbl->count - inh_count;
+	int alloc_count = (ptb->count < 4) ? 4 : ptb->count;
+	ptb->partitions = calloc(alloc_count, sizeof(struct partitions));
+	if (!ptb->partitions) {
+		free(ptb);
+		return -ENOMEM;
+	}
+	memcpy(ptb->partitions, &p_iptbl->partitions[inh_count],
+	       ptb->count * sizeof(struct partitions));
+
+#ifdef CONFIG_MBR_ROOTFS_OFFSET_EXTRA
+	for (i = 0; i < ptb->count; i++) {
+		ptb->partitions[i].offset += CONFIG_MBR_ROOTFS_OFFSET_EXTRA;
+		if (ptb->partitions[i].size != (uint64_t)-1 &&
+		    ptb->partitions[i].size > CONFIG_MBR_ROOTFS_OFFSET_EXTRA)
+			ptb->partitions[i].size -= CONFIG_MBR_ROOTFS_OFFSET_EXTRA;
+	}
+#endif
+
 	mbr = malloc(sizeof(struct dos_mbr_or_ebr));
+	if (!mbr) {
+		free(ptb);
+		return -ENOMEM;
+	}
 
-	for (i=0;i<ptb->count;i++) {
-		apt_info("-update MBR-: partition[%02d]: %016llx - %016llx\n",i,
+	for (i = 0; i < ptb->count; i++) {
+		apt_info("-update MBR-: partition[%02d]: %016llx - %016llx\n", i,
 			ptb->partitions[i].offset, ptb->partitions[i].size);
 	}
 
-	for (i = 0;i < ptb->count;) {
-		memset(mbr ,0 ,sizeof(struct dos_mbr_or_ebr));
+	for (i = 0; i < ptb->count; ) {
+		memset(mbr, 0, sizeof(struct dos_mbr_or_ebr));
 		if (i == 0) {
 			_construct_mbr_or_ebr(ptb, mbr, i, 0);
-			i = i+2;
+			mbr->bootstart[440] = 0x4a;
+			mbr->bootstart[441] = 0x48;
+			mbr->bootstart[442] = 0x33;
+			mbr->bootstart[443] = 0x00;
+			i = i + 2;
 		} else
 			_construct_mbr_or_ebr(ptb, mbr, i, 2);
 		src = (unsigned char *)mbr;
@@ -1135,12 +1178,15 @@ static __attribute__((unused)) int _update_ptbl_mbr(struct mmc *mmc, struct _ipt
 		ret = blk_dwrite(mmc_get_blk_desc(mmc), start_blk, blk_cnt, src);
 		i++;
 		if (ret != blk_cnt) {
-			apt_err("write current MBR failed! ret: %d != cnt: %d\n",ret,blk_cnt);
+			apt_err("write current MBR failed! ret: %d != cnt: %d\n", ret, blk_cnt);
 			break;
 		}
-		start_blk = (ptb->partitions[i].offset - PARTITION_RESERVED) >> 9;
+		if (i < ptb->count)
+			start_blk = (ptb->partitions[i].offset - PARTITION_RESERVED) >> 9;
 	}
 	free(mbr);
+	free(ptb->partitions);
+	free(ptb);
 
 	ret = !ret;
 	if (ret)

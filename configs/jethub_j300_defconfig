@@ -83,23 +83,15 @@ CONFIG_OF_LIBFDT_OVERLAY=y
 CONFIG_BOOTDELAY=5
 CONFIG_SPI=y
 CONFIG_DM_SPI=y
-CONFIG_SPI_FLASH=y
-CONFIG_DM_SPI_FLASH=y
-CONFIG_AMLOGIC_SPIFC=y
-CONFIG_SPI_FLASH_MACRONIX=y
-CONFIG_SPI_FLASH_MICRON=y
 # CONFIG_AML_ROBUST is not set
 # CONFIG_DISPLAY_CPUINFO is not set
 CONFIG_EFUSE=y
-CONFIG_BOOTCOMMAND="setenv devtype mmc; setenv devnum 1; if load mmc 0 0x12000000 boot/boot.scr; then setenv devnum 0; source 0x12000000; else if load mmc 1:1 0x12000000 boot/boot.scr; then source 0x12000000; fi; fi"
+CONFIG_BOOTCOMMAND="setenv devtype mmc; setenv devnum 1; if load mmc 0 0x12000000 boot/boot.scr; then setenv devnum 0; source 0x12000000; else if load mmc 1:1 0x12000000 boot/boot.scr; then source 0x12000000; else echo Normal boot failed, trying recovery...; run boot_recovery; fi; fi"
 CONFIG_USE_PREBOOT=y
-CONFIG_PREBOOT="echo JetHub J300 boot"
-CONFIG_SPI_FLASH_MTD=y
 CONFIG_MTD_BLOCK=y
 CONFIG_MTD_PARTITIONS=y
 CONFIG_SHA256=y
 CONFIG_FIT=y
-CONFIG_AML_FACTORY_BURN_LOCAL_UPGRADE=y
 CONFIG_AML_V3_FACTORY_BURN=y
 CONFIG_AML_V3_USB_TOOl=y
 CONFIG_BOARD_LATE_INIT=y

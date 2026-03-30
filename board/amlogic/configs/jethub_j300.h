@@ -46,10 +46,48 @@
 #define CONFIG_BOOTLOADER_CONTROL_BLOCK
 #endif
 
+#define CONFIG_PTBL_MBR	(1)
+
+/* Extra bytes to add to rootfs offset in MBR (2 x 102 MiB recovery slots) */
+#define CONFIG_MBR_ROOTFS_OFFSET_EXTRA	(204 * 1024 * 1024ULL)
+
 /* args/envs */
+#define CONFIG_PREBOOT  "echo JetHub J300 boot; run check_recovery"
 #define CONFIG_SYS_MAXARGS  64
 
-#define CONFIG_PREBOOT  "echo JetHub J300 boot"
+#define CONFIG_EXTRA_ENV_SETTINGS \
+	"dtb_mem_addr=0x01000000\0" \
+	"common_dtb_load=imgread dtb _aml_dtb 0x01000000\0" \
+	"loadaddr=0x00020000\0" \
+	"loadaddr_kernel=0x03000000\0" \
+	"firstboot=1\0" \
+	"upgrade_step=0\0" \
+	"recovery_slot=A\0" \
+	"recovery_fit_addr=0x20000000\0" \
+	"recovery_slot_a_start=0x42000\0" \
+	"recovery_slot_b_start=0x75000\0" \
+	"recovery_slot_sectors=0x33000\0" \
+	"boot_recovery=" \
+		"echo Booting recovery (slot ${recovery_slot})...;" \
+		"gpio toggle GPIOX_0;" \
+		"gpio set GPIOZ_4;" \
+		"gpio set GPIOZ_6;" \
+		"if test ${recovery_slot} = B; then " \
+			"setenv recovery_start ${recovery_slot_b_start};" \
+		"else " \
+			"setenv recovery_start ${recovery_slot_a_start};" \
+		"fi;" \
+		"setenv bootargs console=ttyS0,921600n8 earlycon=aml_uart,0xfe07a000 loglevel=4;" \
+		"mmc dev 1;" \
+		"mmc read ${recovery_fit_addr} ${recovery_start} ${recovery_slot_sectors};" \
+		"bootm ${recovery_fit_addr}#recovery ${recovery_fit_addr}#recovery ${recovery_fit_addr}#recovery\0" \
+	"check_recovery=" \
+		"if gpio input GPIODV_2; then " \
+			"true;" \
+		"else " \
+			"echo Recovery button pressed;" \
+			"run boot_recovery;" \
+		"fi\0"
 
 #define CONFIG_FIT 1
 #define CONFIG_OF_LIBFDT 1
