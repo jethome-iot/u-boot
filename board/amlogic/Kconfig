@@ -524,6 +524,12 @@ config S7_BH201
 	help
 		Select S7 BH201 config
 
+config JETHUB_J300Y5
+	bool "JETHUB_J300Y5"
+	select TARGET_JETHUB_J300Y5
+	help
+		Select JetHub J300Y5 (S7/S905Y5) config
+
 config S7_BH202
 	bool "S7_BH202"
 	select TARGET_S7_BH202
@@ -569,6 +575,10 @@ config TARGET_S7_SKT
 config TARGET_S7_BH201
 	bool "S7 BH201 board"
 	depends on S7_BH201
+
+config TARGET_JETHUB_J300Y5
+	bool "JetHub J300Y5 board"
+	depends on JETHUB_J300Y5
 
 config TARGET_S7_BH202
 	bool "S7 BH202 board"
@@ -926,6 +936,8 @@ source "board/amlogic/s1a_skt/Kconfig"
 source "board/amlogic/s7_skt/Kconfig"
 
 source "board/amlogic/s7_bh201/Kconfig"
+
+source "board/amlogic/jethub_j300y5/Kconfig"
 
 source "board/amlogic/s7_bh202/Kconfig"
 
