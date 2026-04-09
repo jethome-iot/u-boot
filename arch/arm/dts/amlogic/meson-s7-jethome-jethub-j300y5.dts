@@ -17,7 +17,6 @@
 
 	aliases {
 		serial0 = &uart_b;
-		ethernet0 = &ethmac;
 		mmc0 = &sd_emmc_b;  /* SD card */
 		mmc1 = &sd_emmc_c;  /* eMMC */
 	};
@@ -48,32 +47,38 @@
 		regulator-boot-on;
 		regulator-always-on;
 	};
-
-	vcc_3v3: regulator-vcc-3v3 {
-		compatible = "regulator-fixed";
-		regulator-name = "VCC_3V3";
-		regulator-min-microvolt = <3300000>;
-		regulator-max-microvolt = <3300000>;
-		regulator-boot-on;
-		regulator-always-on;
-	};
-
-	vcc_5v: regulator-vcc-5v {
-		compatible = "regulator-fixed";
-		regulator-name = "VCC_5V";
-		regulator-min-microvolt = <5000000>;
-		regulator-max-microvolt = <5000000>;
-		regulator-boot-on;
-		regulator-always-on;
-	};
-
-	emmc_pwrseq: emmc-pwrseq {
-		compatible = "mmc-pwrseq-emmc";
-	};
 };
 
 &uart_b {
 	status = "okay";
+};
+
+/* SD card */
+&sd_emmc_b {
+	status = "okay";
+	pinctrl-0 = <&sdcard_pins>;
+	pinctrl-1 = <&sdcard_pins &to_sduart_pins>;
+	pinctrl-names = "sd_all_pins", "sd_uart";
+
+	bus-width = <4>;
+	cap-sd-highspeed;
+	max-frequency = <50000000>;
+	disable-wp;
+	no-sd-uhs;
+
+	card_type = <5>;
+
+	cd-gpios = <&gpio GPIOC_6 GPIO_ACTIVE_HIGH>;
+	cd-inverted;
+
+	init_co_phase = <2>;
+	init_tx_phase = <0>;
+
+	sd_hs_co_phase = <2>;
+	sd_hs_to_phase = <0>;
+
+	vmmc-supply = <&vddao_3v3>;
+	vqmmc-supply = <&vddio_boot>;
 };
 
 /* eMMC */
@@ -102,27 +107,35 @@
 	hw_reset = <&gpio GPIOB_9 GPIO_ACTIVE_HIGH>;
 };
 
-/* SD card */
-&sd_emmc_b {
+/* USB */
+&crg1 {
 	status = "okay";
-	pinctrl-0 = <&sdcard_pins>;
-	pinctrl-1 = <&sdcard_pins &to_sduart_pins>;
-	pinctrl-names = "sd_all_pins", "sd_uart";
-	card_type = <5>;
+	dr_mode = "host";
+};
 
-	bus-width = <4>;
-	cap-sd-highspeed;
-	max-frequency = <50000000>;
-	disable-wp;
+&usb21_phy_v2 {
+	status = "okay";
+	portnum = <1>;
+};
 
-	cd-gpios = <&gpio GPIOC_6 GPIO_ACTIVE_HIGH>;
-	cd-inverted;
+&usb31_phy_v2 {
+	status = "okay";
+	portnum = <0>;
+};
 
-	init_co_phase = <2>;
-	init_tx_phase = <0>;
+&crg2 {
+	status = "okay";
+	dr_mode = "host";
+};
 
-	sd_hs_co_phase = <2>;
-	sd_hs_to_phase = <0>;
+&usb22_phy_v2 {
+	status = "okay";
+	portnum = <1>;
+};
+
+&usb32_phy_v2 {
+	status = "okay";
+	portnum = <0>;
 };
 
 &ethmac {
