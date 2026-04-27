@@ -52,7 +52,7 @@
 #define CONFIG_MBR_ROOTFS_OFFSET_EXTRA	(204 * 1024 * 1024ULL)
 
 /* args/envs */
-#define CONFIG_PREBOOT  "echo JetHub J300Y5 boot; run check_recovery"
+#define CONFIG_PREBOOT  "echo JetHub J300Y5 boot"
 #define CONFIG_SYS_MAXARGS  64
 
 #define CONFIG_EXTRA_ENV_SETTINGS \
