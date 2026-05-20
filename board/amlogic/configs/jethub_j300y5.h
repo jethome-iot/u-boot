@@ -52,6 +52,7 @@
 #define CONFIG_MBR_ROOTFS_OFFSET_EXTRA	(204 * 1024 * 1024ULL)
 
 /* args/envs */
+/* TODO: append "; run check_recovery" once recovery GPIO/FIT is wired up */
 #define CONFIG_PREBOOT  "echo JetHub J300Y5 boot"
 #define CONFIG_SYS_MAXARGS  64
 
