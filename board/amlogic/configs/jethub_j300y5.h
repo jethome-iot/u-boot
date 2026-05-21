@@ -48,8 +48,11 @@
 
 #define CONFIG_PTBL_MBR	(1)
 
-/* Extra bytes to add to rootfs offset in MBR (2 x 102 MiB recovery slots) */
-#define CONFIG_MBR_ROOTFS_OFFSET_EXTRA	(204 * 1024 * 1024ULL)
+/* Extra bytes to add to rootfs offset in MBR (2 x 102 MiB recovery slots).
+ * Disabled until recovery FIT is wired into the burn flow — otherwise MBR
+ * points 204 MiB past the actual ext4 data and rootfs becomes invisible.
+ */
+#define CONFIG_MBR_ROOTFS_OFFSET_EXTRA	(0)
 
 /* args/envs */
 /* TODO: append "; run check_recovery" once recovery GPIO/FIT is wired up */
