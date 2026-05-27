@@ -1,13 +1,13 @@
-if TARGET_JETHUB_J300Y5
+if TARGET_JETHUB_J310
 
 config SYS_SOC
 	default "s7"
 
 config SYS_BOARD
-	default "jethub_j300y5"
+	default "jethub_j310"
 
 config SYS_CONFIG_NAME
-	default "jethub_j300y5"
+	default "jethub_j310"
 
 config DTB_BIND_KERNEL
     bool "load dtb from boot part but not flash rsv"

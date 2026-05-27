@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: (GPL-2.0+ OR MIT)
 /*
  * Copyright (c) 2026 JetHome
- * Minimal DTS for JetHub J300Y5 (S7/S905Y5)
+ * Minimal DTS for JetHub J310 (S7/S905Y5)
  */
 
 /dts-v1/;
@@ -12,8 +12,8 @@
 #include <dt-bindings/gpio/gpio.h>
 
 / {
-	compatible = "jethome,jethub-j300y5", "amlogic,s7-txxx", "amlogic,meson-s7";
-	model = "JetHome JetHub J300Y5";
+	compatible = "jethome,jethub-j310", "amlogic,s7-txxx", "amlogic,meson-s7";
+	model = "JetHome JetHub J310";
 
 	aliases {
 		serial0 = &uart_b;

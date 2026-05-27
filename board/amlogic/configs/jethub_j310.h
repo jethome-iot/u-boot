@@ -1,10 +1,10 @@
 /* SPDX-License-Identifier: (GPL-2.0+ OR MIT) */
 /*
- * Board configuration for JetHub J300Y5 (S7)
+ * Board configuration for JetHub J310 (S7)
  */
 
-#ifndef __JETHUB_J300Y5_CFG_H__
-#define __JETHUB_J300Y5_CFG_H__
+#ifndef __JETHUB_J310_CFG_H__
+#define __JETHUB_J310_CFG_H__
 
 #include <asm/amlogic/arch/cpu.h>
 
@@ -48,15 +48,13 @@
 
 #define CONFIG_PTBL_MBR	(1)
 
-/* Extra bytes to add to rootfs offset in MBR (2 x 102 MiB recovery slots).
- * Disabled until recovery FIT is wired into the burn flow — otherwise MBR
- * points 204 MiB past the actual ext4 data and rootfs becomes invisible.
- */
-#define CONFIG_MBR_ROOTFS_OFFSET_EXTRA	(0)
+/* Extra bytes to add to rootfs offset in MBR (2 x 102 MiB recovery slots) */
+#define CONFIG_MBR_ROOTFS_OFFSET_EXTRA	(204 * 1024 * 1024ULL)
 
-/* args/envs */
-/* TODO: append "; run check_recovery" once recovery GPIO/FIT is wired up */
-#define CONFIG_PREBOOT  "echo JetHub J300Y5 boot"
+/* NOTE: on TV-box variant `GPIODV_2` doesn't exist, so `gpio input` always
+ * fails and check_recovery falls into recovery every boot. Keep enabled for
+ * now while debugging recovery; revert once normal-boot path is validated. */
+#define CONFIG_PREBOOT  "echo JetHub J310 boot; run check_recovery"
 #define CONFIG_SYS_MAXARGS  64
 
 #define CONFIG_EXTRA_ENV_SETTINGS \
@@ -73,6 +71,8 @@
 	"recovery_slot_sectors=0x33000\0" \
 	"boot_recovery=" \
 		"echo Booting recovery (slot ${recovery_slot})...;" \
+		"setenv fdt_high 0xffffffffffffffff;" \
+		"setenv initrd_high 0xffffffffffffffff;" \
 		"gpio toggle GPIOX_0;" \
 		"gpio set GPIOZ_4;" \
 		"gpio set GPIOZ_6;" \
@@ -215,7 +215,7 @@ defined(CONFIG_STORE_COMPATIBLE)
 	#define CONFIG_CMD_PING 1
 	#define CONFIG_CMD_DHCP 1
 	#define CONFIG_CMD_RARP 1
-	#define CONFIG_HOSTNAME        "jethub_j300y5"
+	#define CONFIG_HOSTNAME        "jethub_j310"
 	#define CONFIG_IPADDR          10.18.9.97
 	#define CONFIG_GATEWAYIP       10.18.9.1
 	#define CONFIG_SERVERIP        10.18.9.113
@@ -256,4 +256,4 @@ defined(CONFIG_STORE_COMPATIBLE)
 
 #define CONFIG_AVB2_UBOOT_SHA256
 
-#endif /* __JETHUB_J300Y5_CFG_H__ */
+#endif /* __JETHUB_J310_CFG_H__ */
