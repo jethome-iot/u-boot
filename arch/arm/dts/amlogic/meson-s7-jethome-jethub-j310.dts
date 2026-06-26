@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: (GPL-2.0+ OR MIT)
 /*
  * Copyright (c) 2026 JetHome
- * Minimal DTS for JetHub J310 (S7/S905Y5)
  */
 
 /dts-v1/;
@@ -10,6 +9,7 @@
 #include "amlogic/meson-s7-txxx.dtsi"
 
 #include <dt-bindings/gpio/gpio.h>
+#include <dt-bindings/input/input.h>
 
 / {
 	compatible = "jethome,jethub-j310", "amlogic,s7-txxx", "amlogic,meson-s7";
@@ -17,6 +17,7 @@
 
 	aliases {
 		serial0 = &uart_b;
+		ethernet0 = &ethmac;
 		mmc0 = &sd_emmc_b;  /* SD card */
 		mmc1 = &sd_emmc_c;  /* eMMC */
 	};
@@ -25,9 +26,10 @@
 		stdout-path = "serial0:921600n8";
 	};
 
+	/* 4GiB RAM */
 	memory@0 {
 		device_type = "memory";
-		reg = <0x0 0x0 0x0 0x80000000>;
+		reg = <0x0 0x0 0x1 0x00000000>;
 	};
 
 	vddio_boot: regulator-vddio-boot {
@@ -47,6 +49,79 @@
 		regulator-boot-on;
 		regulator-always-on;
 	};
+
+	/*
+	 * SD card IO voltage, switched via TPS2116 power mux:
+	 *   PR1 = HIGH -> 3.3V (default speed / init)
+	 *   PR1 = LOW  -> 1.8V (UHS-I signaling)
+	 * PR1 is driven by GPIOH_6
+	 */
+	vqmmc_sd: regulator-vqmmc-sd {
+		compatible = "regulator-gpio";
+		regulator-name = "VQMMC_SD";
+		regulator-min-microvolt = <1800000>;
+		regulator-max-microvolt = <3300000>;
+
+		gpios = <&gpio GPIOH_6 GPIO_ACTIVE_HIGH>;
+		states = <3300000 1>,	/* GPIOH_6 HIGH -> PR1 HIGH -> 3.3V */
+			 <1800000 0>;	/* GPIOH_6 LOW  -> PR1 LOW  -> 1.8V */
+
+		regulator-boot-on;
+	};
+
+	gpio-keys {
+		compatible = "gpio-keys-polled";
+		poll-interval = <100>;
+
+		button_up {
+			label = "Joystick Up";
+			gpios = <&exp24 8 GPIO_ACTIVE_HIGH>;
+			linux,code = <KEY_UP>;
+			debounce-interval = <10>;
+		};
+
+		button_down {
+			label = "Joystick Down";
+			gpios = <&exp24 9 GPIO_ACTIVE_HIGH>;
+			linux,code = <KEY_DOWN>;
+			debounce-interval = <10>;
+		};
+
+		button_left {
+			label = "Joystick Left";
+			gpios = <&exp24 10 GPIO_ACTIVE_HIGH>;
+			linux,code = <KEY_LEFT>;
+			debounce-interval = <10>;
+		};
+
+		button_right {
+			label = "Joystick Right";
+			gpios = <&exp24 11 GPIO_ACTIVE_HIGH>;
+			linux,code = <KEY_RIGHT>;
+			debounce-interval = <10>;
+		};
+
+		button_center {
+			label = "Joystick Center";
+			gpios = <&exp24 12 GPIO_ACTIVE_HIGH>;
+			linux,code = <KEY_ENTER>;
+			debounce-interval = <10>;
+		};
+
+		button_home {
+			label = "Joystick Home";
+			gpios = <&exp24 13 GPIO_ACTIVE_HIGH>;
+			linux,code = <KEY_HOME>;
+			debounce-interval = <10>;
+		};
+
+		button_back {
+			label = "Joystick Back";
+			gpios = <&exp24 14 GPIO_ACTIVE_HIGH>;
+			linux,code = <KEY_BACK>;
+			debounce-interval = <10>;
+		};
+	};
 };
 
 &uart_b {
@@ -62,14 +137,12 @@
 
 	bus-width = <4>;
 	cap-sd-highspeed;
-	max-frequency = <50000000>;
-	disable-wp;
-	no-sd-uhs;
+	sd-uhs-sdr50;
+	sd-uhs-sdr104;
+	max-frequency = <100000000>;
 
 	card_type = <5>;
-
 	cd-gpios = <&gpio GPIOC_6 GPIO_ACTIVE_HIGH>;
-	cd-inverted;
 
 	init_co_phase = <2>;
 	init_tx_phase = <0>;
@@ -78,7 +151,7 @@
 	sd_hs_to_phase = <0>;
 
 	vmmc-supply = <&vddao_3v3>;
-	vqmmc-supply = <&vddio_boot>;
+	vqmmc-supply = <&vqmmc_sd>;
 };
 
 /* eMMC */
@@ -86,13 +159,11 @@
 	status = "okay";
 	pinctrl-0 = <&emmc_pins>;
 	pinctrl-names = "default";
-
 	bus-width = <8>;
 	cap-mmc-highspeed;
-	mmc-hs200-1_8v;
-	max-frequency = <200000000>;
+	mmc-hs400-1_8v;
+	max-frequency = <400000000>;
 	non-removable;
-	disable-wp;
 	card_type = <1>;
 
 	init_co_phase = <2>;
@@ -105,6 +176,96 @@
 	hs2_to_phase = <0>;
 
 	hw_reset = <&gpio GPIOB_9 GPIO_ACTIVE_HIGH>;
+};
+
+&i2c2 {
+	status = "okay";
+    pinctrl-names = "default";
+    pinctrl-0 = <&i2c2_pins2>;
+    clock-frequency = <400000>;
+
+	/* EEPROM on base board */
+	eeprompd: eeprom@56 {
+		compatible = "atmel,24c64";
+		reg = <0x56>;
+		pagesize = <0x20>;
+		label = "eeprompd";
+		address-width = <0x10>;
+		vcc-supply = <&vddao_3v3>;
+	};
+
+
+
+	exp21: gpio@21 {
+		compatible = "ti,tca6408";
+		reg = <0x21>;
+		gpio-controller;
+		#gpio-cells = <2>;
+
+		//Add later
+		//gpio-line-names =
+	};
+};
+
+&i2c3 {
+    status = "okay";
+    pinctrl-names = "default";
+    pinctrl-0 = <&i2c3_pins2>;
+    clock-frequency = <200000>;
+
+	rtc: rtc@51 {
+		status = "okay";
+		compatible = "nxp,pcf8563";
+		reg = <0x51>;
+		wakeup-source;
+	};
+
+	/* Crypto */
+	atecc608a: crypto@60 {
+		compatible = "atmel,atecc508a";
+		reg = <0x60>;
+	};
+
+	/* EEPROM on cpu carrier board */
+	eepromcpu: eeprom@56 {
+		compatible = "atmel,24c64";
+		reg = <0x56>;
+		pagesize = <0x20>;
+		label = "eepromcpu";
+		address-width = <0x10>;
+		vcc-supply = <&vddao_3v3>;
+	};
+
+	/* temperature sensors */
+	temp: tmp102@48 {
+		compatible = "ti,tmp102";
+		reg = <0x48>;
+	};
+
+	ssd1306: oled@3c {
+		compatible = "solomon,ssd1306fb-i2c";
+		reg = <0x3c>;
+		solomon,width = <128>;
+		solomon,height = <64>;
+		solomon,com-invdir;
+		solomon,page-offset = <0>;
+		solomon,dclk-div = <1>;
+		solomon,dclk-frq = <15>;
+		solomon,prechargep1 = <1>;
+		solomon,prechargep2 = <15>;
+	};
+
+	exp24: gpio@24 {
+		compatible = "nxp,pca9535";
+		reg = <0x24>;
+		gpio-controller;
+		#gpio-cells = <2>;
+
+		gpio-line-names =
+			"", "", "", "", "", "", "", "",
+			"JOY_UP", "JOY_DOWN", "JOY_LEFT", "JOY_RIGHT",
+			"JOY_CENTER", "JOY_HOME", "JOY_BACK", "";
+	};
 };
 
 /* USB */
