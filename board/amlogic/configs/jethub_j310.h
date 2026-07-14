@@ -51,10 +51,10 @@
 /* Extra bytes to add to rootfs offset in MBR (2 x 102 MiB recovery slots) */
 #define CONFIG_MBR_ROOTFS_OFFSET_EXTRA	(204 * 1024 * 1024ULL)
 
-/* NOTE: on TV-box variant `GPIODV_2` doesn't exist, so `gpio input` always
- * fails and check_recovery falls into recovery every boot. Keep enabled for
- * now while debugging recovery; revert once normal-boot path is validated. */
-#define CONFIG_PREBOOT  "echo JetHub J310 boot; run check_recovery"
+/* NOTE: `GPIODV_2` read fails here (I2C expander not answering), so
+ * check_recovery always falls into recovery. Disabled for now while bringing
+ * up eMMC/boot; re-add `; run check_recovery` once normal boot is validated. */
+#define CONFIG_PREBOOT  "echo JetHub J310 boot"
 #define CONFIG_SYS_MAXARGS  64
 
 #define CONFIG_EXTRA_ENV_SETTINGS \
