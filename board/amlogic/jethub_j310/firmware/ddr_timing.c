@@ -127,8 +127,8 @@ uint32_t __ddr_parameter_reg_index[] __attribute__ ((section(".ddr_2acs_index"))
 };
 #endif
 
-#define LPDDR4_SKT 1
-#define DDR4_SKT 1
+#define LPDDR4_SKT 0
+#define DDR4_SKT 0
 #define DDR3_SKT 1
 //#define LPDDR4_USE_2LAYER_BOARD 1
 //default 1RANK 16BIT X2 DDR4
@@ -581,7 +581,7 @@ ddr_set_ps0_only_t __ddr_setting[] __attribute__ ((section(".ddr_param"))) = {
 #endif
 
 #if DDR3_SKT
-#define  CACLU_CLK_D3	1056 //636 //1792//600 //1200 //(1900)// (1440)//(1008)
+#define  CACLU_CLK_D3	792 // DDR3-1584 safe start (was 1056) //636 //1792//600 //1200 //(1900)// (1440)//(1008)
 //ddr_set_ps0_only_t __attribute__ ((aligned(8))) ddr_set_t_default_ddr3 = {
 	{
 		.cfg_board_common_setting.timming_magic = 0,
@@ -600,22 +600,16 @@ ddr_set_ps0_only_t __ddr_setting[] __attribute__ ((section(".ddr_param"))) = {
 		.cfg_board_common_setting.DramType = CONFIG_DDR_TYPE_DDR3,
 		.cfg_board_common_setting.enable_lpddr4x_mode = 0,
 		.cfg_board_common_setting.dram_rank_config = CONFIG_DDR0_32BIT_RANK0_CH0,
-		//.cfg_board_common_setting.dram_ch0_size_MB =
-		//	(DRAM_SIZE_ID_256MBX1 << CONFIG_CS0_BYTE_01_SIZE_256_ID_OFFSET) +
-		//	(DRAM_SIZE_ID_256MBX0 << CONFIG_CS0_BYTE_23_SIZE_256_ID_OFFSET) +
-		//	(DRAM_SIZE_ID_256MBX0 << CONFIG_CS1_BYTE_01_SIZE_256_ID_OFFSET) +
-		//	(DRAM_SIZE_ID_256MBX0 << CONFIG_CS1_BYTE_23_SIZE_256_ID_OFFSET),
-		//.cfg_board_common_setting.dram_ch1_size_MB =
-		//	(DRAM_SIZE_ID_256MBX0 << CONFIG_CS0_BYTE_01_SIZE_256_ID_OFFSET) +
-		//	(DRAM_SIZE_ID_256MBX0 << CONFIG_CS0_BYTE_23_SIZE_256_ID_OFFSET) +
-		//	(DRAM_SIZE_ID_256MBX0 << CONFIG_CS1_BYTE_01_SIZE_256_ID_OFFSET) +
-		//	(DRAM_SIZE_ID_256MBX0 << CONFIG_CS1_BYTE_23_SIZE_256_ID_OFFSET),
-		.cfg_board_common_setting.dram_ch0_size_MB = 0xffff,
+		.cfg_board_common_setting.dram_ch0_size_MB =
+			(DRAM_SIZE_ID_256MBX8 << CONFIG_CS0_BYTE_01_SIZE_256_ID_OFFSET) +
+			(DRAM_SIZE_ID_256MBX8 << CONFIG_CS0_BYTE_23_SIZE_256_ID_OFFSET) +
+			(DRAM_SIZE_ID_256MBX0 << CONFIG_CS1_BYTE_01_SIZE_256_ID_OFFSET) +
+			(DRAM_SIZE_ID_256MBX0 << CONFIG_CS1_BYTE_23_SIZE_256_ID_OFFSET),
 		.cfg_board_common_setting.DisabledDbyte[0] = 0x00,
 		//bit 0 -3 ch0 cs0 ,bit 4-7 ch0 cs1,
 		//.cfg_board_common_setting.DisabledDbyte[1] = 0xf0,
 		//bit 0 -3 ch1 cs0 ,bit 4-7 ch1
-		.cfg_board_common_setting.dram_x4x8x16_mode = CONFIG_DRAM_MODE_X16,
+		.cfg_board_common_setting.dram_x4x8x16_mode = CONFIG_DRAM_MODE_X8,
 		.cfg_board_common_setting.Is2Ttiming = CONFIG_USE_DDR_2T_MODE,
 		.cfg_board_common_setting.log_level = 0xff,
 		//.cfg_board_common_setting.log_level = 4,
