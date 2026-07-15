@@ -274,7 +274,7 @@ int checkhw(char *name)
 	cpu_id_t cpu_id = get_cpu_id();
 
 	if (cpu_id.family_id == 0x46)
-		strcpy(dtb_name, "s7_jethub_j310");
+		strcpy(dtb_name, "s7_s905y5_j310");
 
 	strcpy(name, dtb_name);
 	env_set("aml_dt", dtb_name);
