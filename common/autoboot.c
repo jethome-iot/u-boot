@@ -406,13 +406,8 @@ static int abortboot_single_key(int bootdelay)
 					menukey = key;
 				break;
 			}
-#ifdef CONFIG_AMLOGIC_MODIFY
-			udelay(10000);
-		} while (!abort && get_timer(ts) < 100);
-#else
 			udelay(10000);
 		} while (!abort && get_timer(ts) < 1000);
-#endif
 		printf("\b\b\b%2d ", bootdelay);
 	}
 
