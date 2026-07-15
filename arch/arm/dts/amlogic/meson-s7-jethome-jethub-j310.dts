@@ -69,6 +69,23 @@
 		regulator-boot-on;
 	};
 
+	leds {
+		compatible = "gpio-leds";
+
+		led_red: led-red {
+			label = "jethub:red:fault";
+			gpios = <&gpio GPIOZ_5 GPIO_ACTIVE_HIGH>;
+			default-state = "off";
+		};
+
+		led_green: led-green {
+			label = "jethub:green:heartbeat";
+			gpios = <&gpio GPIOZ_4 GPIO_ACTIVE_HIGH>;
+			default-state = "on";
+			linux,default-trigger = "heartbeat";
+		};
+	};
+
 	gpio-keys {
 		compatible = "gpio-keys-polled";
 		poll-interval = <100>;
