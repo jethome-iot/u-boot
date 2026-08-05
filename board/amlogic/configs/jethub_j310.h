@@ -51,10 +51,7 @@
 /* Extra bytes to add to rootfs offset in MBR (2 x 102 MiB recovery slots) */
 #define CONFIG_MBR_ROOTFS_OFFSET_EXTRA	(204 * 1024 * 1024ULL)
 
-/* NOTE: `GPIODV_2` read fails here (I2C expander not answering), so
- * check_recovery always falls into recovery. Disabled for now while bringing
- * up eMMC/boot; re-add `; run check_recovery` once normal boot is validated. */
-#define CONFIG_PREBOOT  "echo JetHub J310 boot"
+#define CONFIG_PREBOOT  "echo JetHub J310 boot; run check_recovery"
 #define CONFIG_SYS_MAXARGS  64
 
 #define CONFIG_EXTRA_ENV_SETTINGS \
@@ -73,20 +70,18 @@
 		"echo Booting recovery (slot ${recovery_slot})...;" \
 		"setenv fdt_high 0xffffffffffffffff;" \
 		"setenv initrd_high 0xffffffffffffffff;" \
-		"gpio toggle GPIOX_0;" \
-		"gpio set GPIOZ_4;" \
-		"gpio set GPIOZ_6;" \
+		"gpio clear GPIOZ_12;" \
 		"if test ${recovery_slot} = B; then " \
 			"setenv recovery_start ${recovery_slot_b_start};" \
 		"else " \
 			"setenv recovery_start ${recovery_slot_a_start};" \
 		"fi;" \
-		"setenv bootargs console=ttyS0,921600n8 earlycon=aml_uart,0xfe07a000 loglevel=4;" \
+		"setenv bootargs console=ttyS0,921600n8 earlycon=aml_uart,0xfe07a000 loglevel=7 systemd.show_status=false;" \
 		"mmc dev 1;" \
 		"mmc read ${recovery_fit_addr} ${recovery_start} ${recovery_slot_sectors};" \
 		"bootm ${recovery_fit_addr}#recovery ${recovery_fit_addr}#recovery ${recovery_fit_addr}#recovery\0" \
 	"check_recovery=" \
-		"if gpio input GPIODV_2; then " \
+		"if gpio input GPIOZ_11; then " \
 			"true;" \
 		"else " \
 			"echo Recovery button pressed;" \
