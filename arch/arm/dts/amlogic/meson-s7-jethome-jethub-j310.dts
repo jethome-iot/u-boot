@@ -62,7 +62,10 @@
 		regulator-min-microvolt = <1800000>;
 		regulator-max-microvolt = <3300000>;
 
+		vin-supply = <&vddao_3v3>;
+
 		gpios = <&gpio GPIOH_6 GPIO_ACTIVE_HIGH>;
+		gpios-states = <1>;	/* boots high -> 3.3V, matches the R11 pull-up */
 		states = <3300000 1>,	/* GPIOH_6 HIGH -> PR1 HIGH -> 3.3V */
 			 <1800000 0>;	/* GPIOH_6 LOW  -> PR1 LOW  -> 1.8V */
 
@@ -156,7 +159,7 @@
 	cap-sd-highspeed;
 	sd-uhs-sdr50;
 	sd-uhs-sdr104;
-	max-frequency = <100000000>;
+	max-frequency = <200000000>;
 
 	card_type = <5>;
 	cd-gpios = <&gpio GPIOC_6 GPIO_ACTIVE_HIGH>;
@@ -179,7 +182,7 @@
 	bus-width = <8>;
 	cap-mmc-highspeed;
 	mmc-hs400-1_8v;
-	max-frequency = <400000000>;
+	max-frequency = <200000000>;
 	non-removable;
 	card_type = <1>;
 
@@ -202,11 +205,11 @@
     clock-frequency = <400000>;
 
 	/* EEPROM on base board */
-	eeprompd: eeprom@56 {
+	eeprom_base: eeprom@56 {
 		compatible = "atmel,24c64";
 		reg = <0x56>;
 		pagesize = <0x20>;
-		label = "eeprompd";
+		label = "eeprom_base";
 		address-width = <0x10>;
 		vcc-supply = <&vddao_3v3>;
 	};
@@ -219,8 +222,11 @@
 		gpio-controller;
 		#gpio-cells = <2>;
 
-		//Add later
-		//gpio-line-names =
+		gpio-line-names =
+			"UXM1_RESET", "UXM1_MODE",
+			"UXM2_RESET", "UXM2_MODE",
+			"UXM3_RESET", "UXM3_MODE",
+			"UXM4_RESET", "UXM4_MODE";
 	};
 };
 
@@ -244,11 +250,11 @@
 	};
 
 	/* EEPROM on cpu carrier board */
-	eepromcpu: eeprom@56 {
+	eeprom_carrier: eeprom@56 {
 		compatible = "atmel,24c64";
 		reg = <0x56>;
 		pagesize = <0x20>;
-		label = "eepromcpu";
+		label = "eeprom_carrier";
 		address-width = <0x10>;
 		vcc-supply = <&vddao_3v3>;
 	};
