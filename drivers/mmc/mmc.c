@@ -926,6 +926,136 @@ int mmc_set_ext_csd(struct mmc *mmc, u8 index, u8 value)
 }
 #endif
 
+#if CONFIG_IS_ENABLED(MMC_HW_PARTITIONING)
+int mmc_user_wp_set_range(struct mmc *mmc, lbaint_t start_blk,
+			  lbaint_t count_blk, lbaint_t *aligned_start,
+			  lbaint_t *aligned_count)
+{
+	ALLOC_CACHE_ALIGN_BUFFER(u8, ext_csd, MMC_MAX_BLOCK_LEN);
+	struct mmc_cmd cmd = {};
+	lbaint_t grp, end, addr;
+	u8 user_wp;
+	int ret;
+
+	if (IS_SD(mmc) || mmc->version < MMC_VERSION_4_41)
+		return -ENOTSUPP;
+	if (!mmc->hc_wp_grp_size)
+		return -ENOTSUPP;
+	if (!count_blk)
+		return -EINVAL;
+	if (start_blk >= mmc->capacity_user >> 9)
+		return -ERANGE;
+
+	grp = mmc->hc_wp_grp_size;
+	/* Align outward: [start_blk, start_blk+count_blk) -> WP-group bounds */
+	end = ((start_blk + count_blk + grp - 1) / grp) * grp;
+	start_blk = (start_blk / grp) * grp;
+	if (end > mmc->capacity_user >> 9)
+		end = mmc->capacity_user >> 9;
+	if (end <= start_blk)
+		return -ERANGE;
+	count_blk = end - start_blk;
+
+	ret = mmc_send_ext_csd(mmc, ext_csd);
+	if (ret)
+		return ret;
+	user_wp = ext_csd[EXT_CSD_USER_WP];
+	/*
+	 * Refuse if permanent-WP enable is already latched: any CMD28 we issue
+	 * would make the affected WP-groups permanently read-only. This code
+	 * never wants to be responsible for an irreversible change -- the user
+	 * must clear the bit out-of-band first (or power-cycle, since this bit
+	 * is cleared on power-on).
+	 */
+	if (user_wp & EXT_CSD_USER_WP_US_PERM_WP_EN)
+		return -EACCES;
+	/*
+	 * If US_PWR_WP_DIS is set, the host cannot enable power-on WP until
+	 * the next power cycle. Bail out early with a clear error.
+	 */
+	if (user_wp & EXT_CSD_USER_WP_US_PWR_WP_DIS)
+		return -EPERM;
+
+	ret = mmc_switch(mmc, EXT_CSD_CMD_SET_NORMAL, EXT_CSD_USER_WP,
+			 (user_wp & ~EXT_CSD_USER_WP_US_PERM_WP_EN) |
+			 EXT_CSD_USER_WP_US_PWR_WP_EN);
+	if (ret)
+		return ret;
+
+	for (addr = start_blk; addr < end; addr += grp) {
+		cmd.cmdidx = MMC_CMD_SET_WRITE_PROT;
+		cmd.resp_type = MMC_RSP_R1b;
+		/* HC cards take block address; SC cards want bytes */
+		cmd.cmdarg = mmc->high_capacity ? addr : addr << 9;
+		ret = mmc_send_cmd(mmc, &cmd, NULL);
+		if (ret)
+			goto out_restore;
+	}
+
+out_restore:
+	/*
+	 * Always restore USER_WP so a stray CMD28 later will not latch WP.
+	 * Mask out US_PERM_WP_EN even though we refused to run when it was set
+	 * on entry -- defence in depth against any future code path that would
+	 * have left the bit armed.
+	 */
+	mmc_switch(mmc, EXT_CSD_CMD_SET_NORMAL, EXT_CSD_USER_WP,
+		   user_wp & ~EXT_CSD_USER_WP_US_PERM_WP_EN);
+
+	if (!ret) {
+		if (aligned_start)
+			*aligned_start = start_blk;
+		if (aligned_count)
+			*aligned_count = count_blk;
+	}
+	return ret;
+}
+
+int mmc_user_wp_get_type(struct mmc *mmc, lbaint_t start_blk, u64 *type)
+{
+	ALLOC_CACHE_ALIGN_BUFFER(u8, buf, MMC_MAX_BLOCK_LEN);
+	struct mmc_cmd cmd = {};
+	struct mmc_data data = {};
+	u64 packed = 0;
+	int i, ret;
+
+	if (IS_SD(mmc) || mmc->version < MMC_VERSION_4_41)
+		return -ENOTSUPP;
+	if (!mmc->hc_wp_grp_size)
+		return -ENOTSUPP;
+	if (!type)
+		return -EINVAL;
+
+	/* CMD31 operates on the WP-group containing start_blk */
+	start_blk = (start_blk / mmc->hc_wp_grp_size) * mmc->hc_wp_grp_size;
+
+	cmd.cmdidx = MMC_CMD_SEND_WRITE_PROT_TYPE;
+	cmd.resp_type = MMC_RSP_R1;
+	cmd.cmdarg = mmc->high_capacity ? start_blk : start_blk << 9;
+
+	data.dest = (char *)buf;
+	data.blocks = 1;
+	data.blocksize = 8;
+	data.flags = MMC_DATA_READ;
+
+	ret = mmc_send_cmd(mmc, &cmd, &data);
+	if (ret)
+		return ret;
+
+	/*
+	 * Per JESD84: SEND_WRITE_PROT_TYPE returns 8 bytes, MSB first. The
+	 * lowest-address group's 2-bit type ends up in the LSBs of the packed
+	 * value, so bit (2*n) of the u64 is the type of the n-th group from
+	 * start_blk. NOTE: validate this decode against Linux
+	 * 'mmc writeprotect user get' on the same group after first bring-up.
+	 */
+	for (i = 0; i < 8; i++)
+		packed = (packed << 8) | buf[i];
+	*type = packed;
+	return 0;
+}
+#endif /* CONFIG_IS_ENABLED(MMC_HW_PARTITIONING) */
+
 #if !CONFIG_IS_ENABLED(MMC_TINY)
 static int mmc_set_card_speed(struct mmc *mmc, enum bus_mode mode,
 			      bool hsdowngrade)

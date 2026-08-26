@@ -1291,6 +1291,18 @@ config CMD_MMC_SWRITE
 	  Enable support for the "mmc swrite" command to write Android sparse
 	  images to eMMC.
 
+config CMD_MMC_USER_WP
+	bool "mmc wp user -- user-area write protection"
+	depends on CMD_MMC
+	select MMC_HW_PARTITIONING
+	help
+	  Enable "mmc wp user {info|set|status}" subcommands for managing
+	  power-on write protection of the user data area on eMMC (CMD28 /
+	  CMD31 and EXT_CSD[171] USER_WP). Protection is aligned to the
+	  HC_WP_GRP_SIZE boundary and is cleared by a full power cycle, which
+	  is useful for defending a second image during development without
+	  the risk of permanent write protection.
+
 endif
 
 config CMD_CLONE

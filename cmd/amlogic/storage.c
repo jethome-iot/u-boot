@@ -494,6 +494,8 @@ u32 store_rsv_size(const char *name)
 {
 	struct storage_t *store = store_get_current();
 
+	if (!store)
+		return 0;
 	return store->get_rsv_size(name);
 }
 
@@ -501,6 +503,8 @@ int store_rsv_read(const char *name, size_t size, void *buf)
 {
 	struct storage_t *store = store_get_current();
 
+	if (!store)
+		return -1;
 	return store->read_rsv(name, size, buf);
 }
 
@@ -508,6 +512,8 @@ int store_rsv_write(const char *name, size_t size, void *buf)
 {
 	struct storage_t *store = store_get_current();
 
+	if (!store)
+		return -1;
 	return store->write_rsv(name, size, buf);
 }
 
@@ -515,6 +521,8 @@ int store_rsv_erase(const char *name)
 {
 	struct storage_t *store = store_get_current();
 
+	if (!store)
+		return -1;
 	return store->erase_rsv(name);
 }
 

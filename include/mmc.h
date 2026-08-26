@@ -109,6 +109,10 @@ struct bd_info;
 #define MMC_CMD_SET_BLOCK_COUNT         23
 #define MMC_CMD_WRITE_SINGLE_BLOCK	24
 #define MMC_CMD_WRITE_MULTIPLE_BLOCK	25
+#define MMC_CMD_SET_WRITE_PROT		28
+#define MMC_CMD_CLR_WRITE_PROT		29
+#define MMC_CMD_SEND_WRITE_PROT		30
+#define MMC_CMD_SEND_WRITE_PROT_TYPE	31
 #define MMC_CMD_ERASE_GROUP_START	35
 #define MMC_CMD_ERASE_GROUP_END		36
 #define MMC_CMD_ERASE			38
@@ -311,6 +315,17 @@ static inline bool mmc_is_tuning_cmd(uint cmdidx)
 #define EXT_CSD_BOOT_WP_B_SEC_WP_SEL	(0x80)	/* enable partition selector */
 #define EXT_CSD_BOOT_WP_B_PWR_WP_SEC_SEL (0x02)	/* partition selector to protect */
 #define EXT_CSD_BOOT_WP_B_PWR_WP_EN	(0x01)	/* power-on write-protect */
+
+#define EXT_CSD_USER_WP_US_PWR_WP_EN	(0x01)	/* enable power-on WP via CMD28 */
+#define EXT_CSD_USER_WP_US_PERM_WP_EN	(0x04)	/* enable permanent WP via CMD28 */
+#define EXT_CSD_USER_WP_US_PWR_WP_DIS	(0x08)	/* disable US_PWR_WP_EN */
+#define EXT_CSD_USER_WP_US_PERM_WP_DIS	(0x10)	/* disable US_PERM_WP_EN */
+
+/* CMD31 SEND_WRITE_PROT_TYPE returns 2 bits per WP-group: */
+#define MMC_WP_TYPE_NONE	0x0
+#define MMC_WP_TYPE_TEMP	0x1
+#define MMC_WP_TYPE_PWR		0x2
+#define MMC_WP_TYPE_PERM	0x3
 
 #define EXT_CSD_WR_DATA_REL_USR		(1 << 0)	/* user data area WR_REL */
 #define EXT_CSD_WR_DATA_REL_GP(x)	(1 << ((x)+1))	/* GP part (x+1) WR_REL */
@@ -1016,6 +1031,38 @@ int mmc_boot_wp(struct mmc *mmc);
  * @return 0 for success
  */
 int mmc_boot_wp_single_partition(struct mmc *mmc, int partition);
+
+/**
+ * mmc_user_wp_set_range() - power-on write protect a user-area LBA range.
+ *
+ * The request is aligned outward to HC_WP_GRP_SIZE boundaries. The protected
+ * region persists until the next power cycle (a warm reboot may or may not
+ * clear it depending on whether the board actually removes eMMC VCC).
+ *
+ * @mmc:          the mmc device
+ * @start_blk:    first 512-byte LBA of the requested range
+ * @count_blk:    length in 512-byte blocks
+ * @aligned_start: out, first LBA that was actually protected
+ * @aligned_count: out, number of blocks that were actually protected
+ * Return: 0 on success, negative errno otherwise
+ */
+int mmc_user_wp_set_range(struct mmc *mmc, lbaint_t start_blk,
+			  lbaint_t count_blk, lbaint_t *aligned_start,
+			  lbaint_t *aligned_count);
+
+/**
+ * mmc_user_wp_get_type() - read WP type for 32 WP-groups starting at start_blk.
+ *
+ * Sends CMD31 (SEND_WRITE_PROT_TYPE). Each pair of bits in the returned 64-bit
+ * value describes one WP-group; the least-significant pair corresponds to the
+ * group containing @start_blk. Encoding: see MMC_WP_TYPE_* in this file.
+ *
+ * @mmc:       the mmc device
+ * @start_blk: 512-byte LBA inside the first WP-group to query
+ * @type:      out, 64-bit packed WP types
+ * Return: 0 on success, negative errno otherwise
+ */
+int mmc_user_wp_get_type(struct mmc *mmc, lbaint_t start_blk, u64 *type);
 
 static inline enum dma_data_direction mmc_get_dma_dir(struct mmc_data *data)
 {
