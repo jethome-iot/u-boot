@@ -80,9 +80,13 @@
 		"mmc dev 1;" \
 		"mmc read ${recovery_fit_addr} ${recovery_start} ${recovery_slot_sectors};" \
 		"bootm ${recovery_fit_addr}#recovery ${recovery_fit_addr}#recovery ${recovery_fit_addr}#recovery\0" \
+	"emmc_protect=" \
+		"if mmc dev 1; then " \
+			"mmc wp user set 0x40000 0x68000;" \
+		"fi\0" \
 	"check_recovery=" \
 		"if gpio input GPIOZ_11; then " \
-			"true;" \
+			"run emmc_protect;" \
 		"else " \
 			"echo Recovery button pressed;" \
 			"run boot_recovery;" \

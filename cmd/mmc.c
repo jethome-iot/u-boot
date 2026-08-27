@@ -1047,7 +1047,7 @@ static int do_mmc_bkops_enable(struct cmd_tbl *cmdtp, int flag,
 #if CONFIG_IS_ENABLED(CMD_MMC_USER_WP)
 static const char * const wp_type_names[] = {
 	[MMC_WP_TYPE_NONE] = "none",
-	[MMC_WP_TYPE_TEMP] = "temp",
+	[MMC_WP_TYPE_TEMP] = "temporary",
 	[MMC_WP_TYPE_PWR]  = "power-on",
 	[MMC_WP_TYPE_PERM] = "permanent",
 };
@@ -1055,61 +1055,40 @@ static const char * const wp_type_names[] = {
 static int do_mmc_user_wp_info(struct mmc *mmc)
 {
 	ALLOC_CACHE_ALIGN_BUFFER(u8, ext_csd, MMC_MAX_BLOCK_LEN);
-	lbaint_t user_blocks, total_groups;
+	lbaint_t user_blocks;
 	u8 user_wp;
 	int ret;
 
 	if (!mmc->hc_wp_grp_size) {
-		printf("HC_WP_GRP_SIZE is zero -- device does not support WP groups\n");
+		printf("WP groups not supported by this device\n");
 		return CMD_RET_FAILURE;
 	}
 
 	ret = mmc_send_ext_csd(mmc, ext_csd);
 	if (ret) {
-		printf("Failed to read EXT_CSD: %d\n", ret);
+		printf("Could not read EXT_CSD: %d\n", ret);
 		return CMD_RET_FAILURE;
 	}
 	user_wp = ext_csd[EXT_CSD_USER_WP];
 	user_blocks = mmc->capacity_user >> 9;
-	total_groups = user_blocks / mmc->hc_wp_grp_size;
 
-	printf("WP granularity (HC_WP_GRP_SIZE): 0x" LBAF " blocks (",
+	printf("WP group size: 0x" LBAF " blocks (",
 	       (lbaint_t)mmc->hc_wp_grp_size);
-	print_size((u64)mmc->hc_wp_grp_size << 9,
-		   ") -- minimum unit that can be protected\n");
-	printf("User area total:                 0x" LBAF " blocks (",
-	       user_blocks);
-	print_size((u64)user_blocks << 9, ", 0x");
-	printf(LBAF " WP-groups)\n", total_groups);
+	print_size((u64)mmc->hc_wp_grp_size << 9, ")\n");
+	printf("User area:     0x" LBAF " blocks (", user_blocks);
+	print_size((u64)user_blocks << 9, ", ");
+	printf(LBAFU " groups)\n", user_blocks / mmc->hc_wp_grp_size);
+	printf("USER_WP:       0x%02x\n", user_wp);
+	printf("Power-on WP:   %s, %s\n",
+	       (user_wp & EXT_CSD_USER_WP_US_PWR_WP_EN) ? "armed" : "disarmed",
+	       (user_wp & EXT_CSD_USER_WP_US_PWR_WP_DIS) ? "locked" : "armable");
+	printf("Permanent WP:  %s, %s\n",
+	       (user_wp & EXT_CSD_USER_WP_US_PERM_WP_EN) ? "ARMED" : "disarmed",
+	       (user_wp & EXT_CSD_USER_WP_US_PERM_WP_DIS) ? "locked" : "armable");
 
-	printf("\nEXT_CSD[171] USER_WP = 0x%02x\n", user_wp);
+	if (user_wp & EXT_CSD_USER_WP_US_PERM_WP_EN)
+		printf("Warning: permanent WP armed, 'wp user set' is irreversible\n");
 
-	printf("\n  Power-on WP (temporary, clears on full power-off):\n");
-	printf("    [bit 0] US_PWR_WP_EN  = %d : %s\n",
-	       !!(user_wp & EXT_CSD_USER_WP_US_PWR_WP_EN),
-	       (user_wp & EXT_CSD_USER_WP_US_PWR_WP_EN) ?
-		       "ARMED -- next CMD28 will latch power-on WP" :
-		       "not armed -- CMD28 has no effect");
-	printf("    [bit 3] US_PWR_WP_DIS = %d : %s\n",
-	       !!(user_wp & EXT_CSD_USER_WP_US_PWR_WP_DIS),
-	       (user_wp & EXT_CSD_USER_WP_US_PWR_WP_DIS) ?
-		       "LOCKED -- cannot arm power-on WP until power cycle" :
-		       "not locked -- power-on WP can be armed");
-
-	printf("\n  Permanent WP (IRREVERSIBLE, survives power cycle):\n");
-	printf("    [bit 2] US_PERM_WP_EN  = %d : %s\n",
-	       !!(user_wp & EXT_CSD_USER_WP_US_PERM_WP_EN),
-	       (user_wp & EXT_CSD_USER_WP_US_PERM_WP_EN) ?
-		       "*** DANGER: next CMD28 WILL BRICK AREAS PERMANENTLY ***" :
-		       "safe -- CMD28 cannot latch permanent WP");
-	printf("    [bit 4] US_PERM_WP_DIS = %d : %s\n",
-	       !!(user_wp & EXT_CSD_USER_WP_US_PERM_WP_DIS),
-	       (user_wp & EXT_CSD_USER_WP_US_PERM_WP_DIS) ?
-		       "permanent WP is forever disabled (write-once safety lock)" :
-		       "permanent WP not disabled (can still be armed)");
-
-	printf("\nUse 'mmc wp user set <start_blk> <count_blk>' to protect a range.\n");
-	printf("Protection clears on full power-off (not on 'reset').\n");
 	return CMD_RET_SUCCESS;
 }
 
@@ -1125,80 +1104,72 @@ static int do_mmc_user_wp_set(struct mmc *mmc, int argc, char *const argv[])
 	start = hextoul(argv[3], NULL);
 	count = hextoul(argv[4], NULL);
 
-	printf("Requested:  blk 0x" LBAF " + 0x" LBAF "\n", start, count);
-
 	ret = mmc_user_wp_set_range(mmc, start, count,
 				    &aligned_start, &aligned_count);
-	if (ret == -ENOTSUPP) {
-		printf("Device does not support HC WP groups\n");
+	switch (ret) {
+	case 0:
+		break;
+	case -ENOTSUPP:
+		printf("WP groups not supported by this device\n");
 		return CMD_RET_FAILURE;
-	}
-	if (ret == -EACCES) {
-		printf("REFUSED: US_PERM_WP_EN is currently set in EXT_CSD[171]."
-		       "\nRunning CMD28 now would latch PERMANENT write-protect"
-		       "\n(irreversible). Power-cycle the device to clear it,"
-		       "\nor clear the bit out-of-band before retrying.\n");
+	case -EACCES:
+		printf("Refused: US_PERM_WP_EN set, CMD28 would protect permanently\n");
 		return CMD_RET_FAILURE;
-	}
-	if (ret == -EPERM) {
-		printf("Power-on WP is locked (US_PWR_WP_DIS set). "
-		       "Power-cycle the device and retry.\n");
+	case -EPERM:
+		printf("Refused: power-on WP locked (US_PWR_WP_DIS), power-cycle first\n");
 		return CMD_RET_FAILURE;
-	}
-	if (ret) {
+	default:
 		printf("WP set failed: %d\n", ret);
 		return CMD_RET_FAILURE;
 	}
 
-	printf("Protected:  blk 0x" LBAF " + 0x" LBAF " (",
-	       aligned_start, aligned_count);
-	print_size((u64)aligned_count << 9, ", 0x");
-	printf(LBAF " WP-groups)\n", aligned_count / mmc->hc_wp_grp_size);
-	printf("NOTE: protection clears on power-off, not on warm reboot.\n");
+	printf("Protected 0x" LBAF "-0x" LBAF " (", aligned_start,
+	       aligned_start + aligned_count - 1);
+	print_size((u64)aligned_count << 9, "), cleared on power cycle\n");
 	return CMD_RET_SUCCESS;
 }
 
 static int do_mmc_user_wp_status(struct mmc *mmc, int argc,
 				 char *const argv[])
 {
-	lbaint_t start, grp_base;
+	lbaint_t start, base, grp = mmc->hc_wp_grp_size;
+	int i, run, ret;
 	u64 type;
-	int i, ret;
 
-	/* argv: [0]="wp" [1]="user" [2]="status" [3]=start */
-	if (argc != 4)
+	/* argv: [0]="wp" [1]="user" [2]="status" [3]=start (optional) */
+	if (argc > 4)
 		return CMD_RET_USAGE;
 
-	start = hextoul(argv[3], NULL);
-	grp_base = (start / mmc->hc_wp_grp_size) * mmc->hc_wp_grp_size;
+	if (!grp) {
+		printf("WP groups not supported by this device\n");
+		return CMD_RET_FAILURE;
+	}
+
+	start = (argc == 4) ? hextoul(argv[3], NULL) : 0;
+	base = (start / grp) * grp;
 
 	ret = mmc_user_wp_get_type(mmc, start, &type);
-	if (ret == -ENOTSUPP) {
-		printf("Device does not support HC WP groups\n");
-		return CMD_RET_FAILURE;
-	}
 	if (ret) {
-		printf("CMD31 SEND_WRITE_PROT_TYPE failed: %d\n", ret);
+		printf("Could not read WP type: %d\n", ret);
 		return CMD_RET_FAILURE;
 	}
 
-	printf("CMD31: 32 WP-groups starting at blk 0x" LBAF
-	       " (group size = ", grp_base);
-	print_size((u64)mmc->hc_wp_grp_size << 9, ", total coverage = ");
-	print_size((u64)mmc->hc_wp_grp_size * 32 << 9, ")\n");
+	printf("WP type from 0x" LBAF ", 32 groups (", base);
+	print_size((u64)grp * 32 << 9, ")\n");
 
-	for (i = 0; i < 32; i++) {
-		unsigned int t = (type >> (2 * i)) & 0x3;
-		lbaint_t first = grp_base + (lbaint_t)i * mmc->hc_wp_grp_size;
-		lbaint_t last  = first + mmc->hc_wp_grp_size - 1;
-		const char *marker = (t == MMC_WP_TYPE_NONE) ? "  " : "=>";
+	/* collapse consecutive groups sharing the same WP type into one line */
+	for (run = 0, i = 1; i <= 32; i++) {
+		unsigned int t = (type >> (2 * run)) & 0x3;
 
-		printf("  %s [%2d] blk 0x" LBAF "..0x" LBAF "  %s\n",
-		       marker, i, first, last, wp_type_names[t]);
+		if (i < 32 && ((type >> (2 * i)) & 0x3) == t)
+			continue;
+		printf("  0x" LBAF "-0x" LBAF "  %s\n",
+		       base + (lbaint_t)run * grp,
+		       base + (lbaint_t)i * grp - 1, wp_type_names[t]);
+		run = i;
 	}
 
-	printf("\nTo inspect further groups: mmc wp user status 0x" LBAF "\n",
-	       grp_base + 32 * (lbaint_t)mmc->hc_wp_grp_size);
+	printf("next: mmc wp user status 0x" LBAF "\n", base + 32 * grp);
 	return CMD_RET_SUCCESS;
 }
 #endif /* CMD_MMC_USER_WP */
@@ -1328,12 +1299,11 @@ U_BOOT_CMD(
 	"       : 0 - first boot partition, 1 - second boot partition\n"
 	"         if not assigned, write protect all boot partitions\n"
 #if CONFIG_IS_ENABLED(CMD_MMC_USER_WP)
-	"mmc wp user info - show HC_WP_GRP_SIZE and USER_WP register\n"
-	"mmc wp user set <start_blk_hex> <count_blk_hex>\n"
-	"   : power-on WP the user-area range; range is aligned outward to\n"
-	"     HC_WP_GRP_SIZE boundaries; protection clears on power cycle.\n"
-	"mmc wp user status <start_blk_hex>\n"
-	"   : query WP type for 32 WP-groups starting at start_blk (CMD31)\n"
+	"mmc wp user info - show user area write protect state\n"
+	"mmc wp user set <blk#> <cnt> - power-on write protect a block range\n"
+	"   : range is grown outward to WP group boundaries\n"
+	"     protection clears on power cycle, not on 'reset'\n"
+	"mmc wp user status [blk#] - show WP type of 32 groups from blk#\n"
 #endif
 #if CONFIG_IS_ENABLED(MMC_HW_PARTITIONING)
 	"mmc hwpartition <USER> <GP> <MODE> - does hardware partitioning\n"
