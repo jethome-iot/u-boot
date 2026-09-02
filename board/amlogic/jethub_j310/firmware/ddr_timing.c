@@ -600,11 +600,7 @@ ddr_set_ps0_only_t __ddr_setting[] __attribute__ ((section(".ddr_param"))) = {
 		.cfg_board_common_setting.DramType = CONFIG_DDR_TYPE_DDR3,
 		.cfg_board_common_setting.enable_lpddr4x_mode = 0,
 		.cfg_board_common_setting.dram_rank_config = CONFIG_DDR0_32BIT_RANK0_CH0,
-		.cfg_board_common_setting.dram_ch0_size_MB =
-			(DRAM_SIZE_ID_256MBX8 << CONFIG_CS0_BYTE_01_SIZE_256_ID_OFFSET) +
-			(DRAM_SIZE_ID_256MBX8 << CONFIG_CS0_BYTE_23_SIZE_256_ID_OFFSET) +
-			(DRAM_SIZE_ID_256MBX0 << CONFIG_CS1_BYTE_01_SIZE_256_ID_OFFSET) +
-			(DRAM_SIZE_ID_256MBX0 << CONFIG_CS1_BYTE_23_SIZE_256_ID_OFFSET),
+		.cfg_board_common_setting.dram_ch0_size_MB = 0xffff,
 		.cfg_board_common_setting.DisabledDbyte[0] = 0x00,
 		//bit 0 -3 ch0 cs0 ,bit 4-7 ch0 cs1,
 		//.cfg_board_common_setting.DisabledDbyte[1] = 0xf0,
