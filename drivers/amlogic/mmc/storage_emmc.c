@@ -15,7 +15,7 @@
 #include <asm/global_data.h>
 #include <asm/amlogic/arch/efuse.h>
 #include "../../../cmd/amlogic/ini/ini_io.h"
-#include "../../drivers/mmc/mmc_private.h"
+#include "../../mmc/mmc_private.h"
 
 #if IS_ENABLED(CONFIG_EFUSE_OBJ_API)
 extern efuse_obj_field_t efuse_field;
