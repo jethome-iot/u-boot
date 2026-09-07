@@ -1051,13 +1051,11 @@ static int _construct_ebr_2nd_entry(struct _iptbl *p_iptbl, struct dos_partition
 	return 0;
 }
 
-/* construct a partition table entry of MBR OR EBR */
 static int _construct_mbr_entry(struct _iptbl *p_iptbl, struct dos_partition *p_entry, int part_num)
 {
 	uint64_t start_offset = 0;
 	uint64_t primary_size = 0;
 	uint64_t extended_size = 0;
-	int i;
 
 	p_entry->boot_ind = 0x00;
 
@@ -1067,10 +1065,12 @@ static int _construct_mbr_entry(struct _iptbl *p_iptbl, struct dos_partition *p_
 	}
 
 	if (part_num == 3) {
+		struct partitions *last =
+			&p_iptbl->partitions[p_iptbl->count - 1];
+
 		p_entry->sys_ind = 0x05;
 		start_offset = (p_iptbl->partitions[3].offset - PARTITION_RESERVED) >> 9;
-		for (i = 3; i < p_iptbl->count; i++)
-			extended_size = p_iptbl->partitions[i].size >> 9;
+		extended_size = ((last->offset + last->size) >> 9) - start_offset;
 
 		memcpy((unsigned char *)p_entry->start4, &start_offset, 4);
 		memcpy((unsigned char *)p_entry->size4, &extended_size, 4);
@@ -1143,12 +1143,15 @@ static __attribute__((unused)) int _update_ptbl_mbr(struct mmc *mmc, struct _ipt
 	       ptb->count * sizeof(struct partitions));
 
 #ifdef CONFIG_MBR_ROOTFS_OFFSET_EXTRA
-	for (i = 0; i < ptb->count; i++) {
-		ptb->partitions[i].offset += CONFIG_MBR_ROOTFS_OFFSET_EXTRA;
-		if (ptb->partitions[i].size != (uint64_t)-1 &&
-		    ptb->partitions[i].size > CONFIG_MBR_ROOTFS_OFFSET_EXTRA)
-			ptb->partitions[i].size -= CONFIG_MBR_ROOTFS_OFFSET_EXTRA;
+	if (ptb->partitions[0].size <= CONFIG_MBR_ROOTFS_OFFSET_EXTRA) {
+		apt_err("partition 0 (%llu) smaller than recovery window\n",
+			ptb->partitions[0].size);
+		free(ptb->partitions);
+		free(ptb);
+		return -1;
 	}
+	ptb->partitions[0].offset += CONFIG_MBR_ROOTFS_OFFSET_EXTRA;
+	ptb->partitions[0].size   -= CONFIG_MBR_ROOTFS_OFFSET_EXTRA;
 #endif
 
 	mbr = malloc(sizeof(struct dos_mbr_or_ebr));
@@ -1166,10 +1169,10 @@ static __attribute__((unused)) int _update_ptbl_mbr(struct mmc *mmc, struct _ipt
 		memset(mbr, 0, sizeof(struct dos_mbr_or_ebr));
 		if (i == 0) {
 			_construct_mbr_or_ebr(ptb, mbr, i, 0);
-			mbr->bootstart[440] = 0x4a;
-			mbr->bootstart[441] = 0x48;
-			mbr->bootstart[442] = 0x33;
-			mbr->bootstart[443] = 0x00;
+			mbr->bootstart[440] = 0x73;
+			mbr->bootstart[441] = 0x73;
+			mbr->bootstart[442] = 0x61;
+			mbr->bootstart[443] = 0x48;
 			i = i + 2;
 		} else
 			_construct_mbr_or_ebr(ptb, mbr, i, 2);
