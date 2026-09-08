@@ -800,6 +800,14 @@ int mmc_boot_write(const char *part_name, uint8_t cpy, size_t size, void *source
 		cpy = cpy >> 1;
 	}
 
+	if (mmc && aml_gpt_valid(mmc) == 0) {
+		int cret = mmc_set_part_conf(mmc, 1, 1, 0);
+
+		if (cret)
+			printf("PART_CONF: failed to enable boot0, ret %d\n", cret);
+		else
+			printf("PART_CONF: ROM boot from boot0 enabled\n");
+	}
 
 W_SWITCH_BACK:
 	ret = blk_select_hwpart_devnum(UCLASS_MMC, STORAGE_EMMC, USER_PARTITION);
