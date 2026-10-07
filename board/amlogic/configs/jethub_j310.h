@@ -76,7 +76,7 @@
 		"else " \
 			"setenv recovery_start ${recovery_slot_a_start};" \
 		"fi;" \
-		"setenv bootargs console=ttyS0,921600n8 earlycon=aml_uart,0xfe07a000 loglevel=7 systemd.show_status=false;" \
+		"setenv bootargs console=ttyS0,921600n8 earlycon=aml_uart,0xfe07a000 loglevel=4 systemd.show_status=false;" \
 		"mmc dev 1;" \
 		"mmc read ${recovery_fit_addr} ${recovery_start} ${recovery_slot_sectors};" \
 		"bootm ${recovery_fit_addr}#recovery ${recovery_fit_addr}#recovery ${recovery_fit_addr}#recovery\0" \
@@ -90,6 +90,17 @@
 		"else " \
 			"echo Recovery button pressed;" \
 			"run boot_recovery;" \
+		"fi\0" \
+	"boot_normal=" \
+		"setenv devtype mmc; " \
+		"setenv devnum 0; " \
+		"if load mmc 0 0x12000000 boot/boot.scr; then " \
+			"source 0x12000000; " \
+		"else " \
+			"setenv devnum 1; " \
+			"if load mmc 1:1 0x12000000 boot/boot.scr; then " \
+				"source 0x12000000; " \
+			"fi; " \
 		"fi\0"
 
 #define CONFIG_FIT 1
@@ -215,10 +226,6 @@ defined(CONFIG_STORE_COMPATIBLE)
 	#define CONFIG_CMD_DHCP 1
 	#define CONFIG_CMD_RARP 1
 	#define CONFIG_HOSTNAME        "jethub_j310"
-	#define CONFIG_IPADDR          10.18.9.97
-	#define CONFIG_GATEWAYIP       10.18.9.1
-	#define CONFIG_SERVERIP        10.18.9.113
-	#define CONFIG_NETMASK         255.255.255.0
 #endif
 
 #define MAC_ADDR_NEW  1
